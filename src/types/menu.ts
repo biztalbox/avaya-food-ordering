@@ -31,13 +31,48 @@ export interface APICategory {
   active: string;
 }
 
+export interface APITax {
+  taxid: string;
+  taxname: string;
+  tax: string;
+  taxtype: string;
+  tax_ordertype: string;
+  active: string;
+  tax_coreortotal: string;
+  tax_taxtype: string;
+  rank: string;
+  consider_in_core_amount: string;
+  description: string;
+}
+
 export interface APIMenuResponse {
   success: boolean;
   message?: string;
   restaurant_id?: string;
   menu?: {
+    success?: string;
+    message?: string;
+    restaurants?: any[];
+    ordertypes?: any[];
+    group_categories?: any[];
     categories?: APICategory[];
     items?: APIItem[];
+    variations?: any[];
+    addongroups?: any[];
+    attributes?: any[];
+    taxes?: APITax[];
+    discounts?: any[];
+    serverdatetime?: string;
+    db_version?: string;
+    application_version?: string;
+    http_code?: number;
+    error?: string;
+  };
+  metadata?: {
+    id: number;
+    status: string;
+    created_at: string;
+    updated_at: string;
   };
 }
 
@@ -54,6 +89,11 @@ export interface MenuItem {
     name: string;
     price: number;
   }[];
+  selectedVariation?: {
+    id: string;
+    name: string;
+    price: number;
+  };
 }
 
 export interface MenuCategory {

@@ -10,11 +10,12 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const MenuContent = () => {
   const { searchQuery } = useCart();
-  const { data: menuCategories, isLoading, error } = useMenuData();
+  const { data: menuData, isLoading, error } = useMenuData();
+  const menuCategories = menuData?.categories;
 
   if (isLoading) {
     return (
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 pt-32 pb-12">
         <div className="space-y-8">
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-4">
@@ -33,7 +34,7 @@ const MenuContent = () => {
 
   if (error) {
     return (
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 pt-32 pb-12">
         <div className="text-center text-cream">
           <h2 className="text-2xl font-semibold mb-2">Unable to load menu</h2>
           <p className="text-cream-muted">Please try again later.</p>
@@ -44,7 +45,7 @@ const MenuContent = () => {
 
   if (!menuCategories || menuCategories.length === 0) {
     return (
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-6 pt-32 pb-12">
         <div className="text-center text-cream">
           <h2 className="text-2xl font-semibold mb-2">No menu items available</h2>
           <p className="text-cream-muted">Please check back later.</p>
@@ -57,12 +58,10 @@ const MenuContent = () => {
   const sortedCategories = searchQuery
     ? [...menuCategories].sort((a, b) => {
         const aMatches = a.items.filter(item =>
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
         ).length;
         const bMatches = b.items.filter(item =>
-          item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+          item.name.toLowerCase().includes(searchQuery.toLowerCase())
         ).length;
         return bMatches - aMatches;
       })

@@ -17,8 +17,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
 
   // Filter items based on search
   const filteredItems = category.items.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    item.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // If searching and no items match, don't show section
@@ -59,15 +58,8 @@ const MenuSection = ({ category }: MenuSectionProps) => {
               alt={category.name}
               className="w-full h-full object-cover"
             />
-            <div className={`absolute inset-0 ${
-              isPizza 
-                ? 'bg-gradient-to-t from-background via-background/70 to-background/30' 
-                : isSalad
-                  ? 'bg-gradient-to-r from-background/90 via-background/60 to-transparent'
-                  : isLeft 
-                    ? 'bg-gradient-to-r from-background/90 via-background/60 to-transparent'
-                    : 'bg-gradient-to-l from-background/90 via-background/60 to-transparent'
-            }`} />
+            {/* Minimal overlay for text readability */}
+            <div className="absolute inset-0 bg-black/20" />
           </div>
 
           {/* Text Content */}
@@ -81,11 +73,11 @@ const MenuSection = ({ category }: MenuSectionProps) => {
                     : 'ml-auto text-right'
               }`}
             >
-              <h2 className="heading-section text-cream mb-3">
+              <h2 className="heading-section text-white mb-3 drop-shadow-lg">
                 {category.name}
               </h2>
               {category.tagline ? (
-                <p className="text-cream-muted text-lg md:text-xl">
+                <p className="text-white/90 text-lg md:text-xl drop-shadow-md">
                   {category.tagline}
                 </p>
               ) : null}

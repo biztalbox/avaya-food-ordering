@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowLeft, Check, Phone, User, MessageSquare } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useMenuData } from '@/hooks/useMenuData';
 
 const CheckoutDrawer = () => {
   const { 
@@ -10,8 +11,13 @@ const CheckoutDrawer = () => {
     setIsCheckoutOpen,
     setIsCartOpen,
     totalPrice,
+    totalTax,
+    totalPriceWithTax,
     clearCart
   } = useCart();
+
+  const { data: menuData } = useMenuData();
+  const taxes = menuData?.taxes || [];
 
   const [formData, setFormData] = useState({
     name: '',
@@ -20,9 +26,7 @@ const CheckoutDrawer = () => {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const deliveryFee = totalPrice >= 30 ? 0 : 2.50;
-  const taxes = totalPrice * 0.08;
-  const grandTotal = totalPrice + deliveryFee + taxes;
+  const grandTotal = totalPriceWithTax;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
@@ -120,14 +124,34 @@ const CheckoutDrawer = () => {
                   <div className="space-y-2 max-h-32 overflow-y-auto">
                     {items.map(item => (
                       <div key={item.id} className="flex justify-between text-sm">
-                        <span className="text-cream">{item.quantity}x {item.name}</span>
-                        <span className="text-cream-muted">${(item.price * item.quantity).toFixed(2)}</span>
+                        <span className="text-cream">
+                        {item.quantity}x {item.name}
+                        {item.selectedVariation && (
+                          <span className="text-accent ml-1">({item.selectedVariation.name})</span>
+                        )}
+                      </span>
+                        <span className="text-cream-muted">₹{(item.price * item.quantity).toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-border flex justify-between">
-                    <span className="font-medium text-cream">Total</span>
-                    <span className="font-semibold text-accent">${grandTotal.toFixed(2)}</span>
+                  <div className="mt-3 pt-3 border-t border-border space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-cream-muted">Subtotal</span>
+                      <span className="text-cream-muted">₹{totalPrice.toFixed(2)}</span>
+                    </div>
+                    {taxes.map((tax) => {
+                      const taxAmount = (totalPrice * parseFloat(tax.tax)) / 100;
+                      return (
+                        <div key={tax.taxid} className="flex justify-between text-sm">
+                          <span className="text-cream-muted">{tax.taxname}</span>
+                          <span className="text-cream-muted">₹{taxAmount.toFixed(2)}</span>
+                        </div>
+                      );
+                    })}
+                    <div className="flex justify-between font-medium text-cream pt-2 border-t border-border">
+                      <span>Total</span>
+                      <span className="font-semibold text-accent">₹{grandTotal.toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
 
@@ -193,7 +217,7 @@ const CheckoutDrawer = () => {
                     : 'bg-muted text-cream-muted cursor-not-allowed'
                 }`}
               >
-                Place Order - ${grandTotal.toFixed(2)}
+                Place Order - ₹{grandTotal.toFixed(2)}
               </motion.button>
               <p className="text-xs text-cream-muted text-center mt-3">
                 By placing this order, you agree to our terms and conditions

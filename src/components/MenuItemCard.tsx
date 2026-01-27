@@ -1,7 +1,8 @@
-import { Leaf, Drumstick } from 'lucide-react';
+import { Leaf, Drumstick, Plus } from 'lucide-react';
 import { MenuItem } from '@/types/menu';
 import { useCart } from '@/context/CartContext';
 import QuantityButton from './QuantityButton';
+import { useState } from 'react';
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -13,7 +14,14 @@ const PLACEHOLDER_IMAGE = '/placeholder.svg';
 
 const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
   const { addItem, removeItem, getItemQuantity } = useCart();
-  const quantity = getItemQuantity(item.id);
+  
+  // Calculate quantities for each variation
+  const getVariationQuantity = (variationId: string) => {
+    return getItemQuantity(item.id, variationId);
+  };
+
+  // Get quantity for normal items (without variations)
+  const normalItemQuantity = getItemQuantity(item.id);
 
   const hasImage = item.image && item.image !== PLACEHOLDER_IMAGE;
 
@@ -23,7 +31,7 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
         relative bg-gradient-card rounded-xl overflow-hidden
         shadow-card
         ${isPizza ? 'p-4' : 'p-3'}
-        ${quantity > 0 ? 'ring-2 ring-accent' : 'ring-1 ring-border/30'}
+        ${normalItemQuantity > 0 || getVariationQuantity(item.variations?.[0]?.id || '') > 0 || getVariationQuantity(item.variations?.[1]?.id || '') > 0 ? 'ring-2 ring-accent' : 'ring-1 ring-border/30'}
       `}
     >
       <div className="flex items-center gap-3">
@@ -66,35 +74,121 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
           {/* Show variations if available */}
           {item.variations && item.variations.length > 0 ? (
             <div className="mt-1">
-              <p className="text-accent font-semibold text-sm">
-                ₹{item.variations[0].price.toFixed(2)} - ₹{item.variations[item.variations.length - 1].price.toFixed(2)}
-              </p>
-
-              <ul className="mt-1 space-y-0.5 text-xs text-cream-muted">
-                {item.variations.slice(0, 4).map((v) => (
-                  <li key={v.id} className="flex items-center justify-between gap-2">
-                    <span className="truncate">{v.name}</span>
-                    <span className="text-cream">₹{v.price.toFixed(2)}</span>
-                  </li>
-                ))}
-                {item.variations.length > 4 ? (
-                  <li className="text-cream-muted">+{item.variations.length - 4} more</li>
-                ) : null}
-              </ul>
+              {/* Check if it's half plate/full plate pattern */}
+              {item.variations.length === 2 && 
+               item.variations.some(v => v.name.toLowerCase().includes('half')) &&
+               item.variations.some(v => v.name.toLowerCase().includes('full')) ? (
+                <div className="space-y-1">
+                  {item.variations.map((variation) => {
+                    const variationQuantity = getVariationQuantity(variation.id);
+                    return (
+                      <div key={variation.id} className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-cream-muted capitalize">
+                          {variation.name}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              const itemWithVariation = {
+                                ...item,
+                                price: variation.price,
+                                selectedVariation: {
+                                  id: variation.id,
+                                  name: variation.name,
+                                  price: variation.price
+                                }
+                              };
+                              addItem(itemWithVariation);
+                            }}
+                            className="flex items-center gap-1 bg-accent/20 hover:bg-accent/30 text-accent px-2 py-1 rounded transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                            <span className="text-xs font-semibold">₹{variation.price.toFixed(2)}</span>
+                          </button>
+                          {variationQuantity > 0 && (
+                            <div className="flex items-center gap-1 bg-card/50 border border-border/50 rounded px-2 py-1">
+                              <button
+                                onClick={() => removeItem(item.id, variation.id)}
+                                className="w-4 h-4 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center text-cream-muted hover:text-destructive transition-colors"
+                              >
+                                <span className="text-xs leading-none">−</span>
+                              </button>
+                              <span className="text-xs font-medium text-cream min-w-[12px] text-center">
+                                {variationQuantity}
+                              </span>
+                              <button
+                                onClick={() => {
+                                  const itemWithVariation = {
+                                    ...item,
+                                    price: variation.price,
+                                    selectedVariation: {
+                                      id: variation.id,
+                                      name: variation.name,
+                                      price: variation.price
+                                    }
+                                  };
+                                  addItem(itemWithVariation);
+                                }}
+                                className="w-4 h-4 rounded-full bg-accent/20 hover:bg-accent/30 flex items-center justify-center text-accent transition-colors"
+                              >
+                                <span className="text-xs leading-none">+</span>
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <>
+                  <p className="text-accent font-semibold text-sm">
+                    ₹{item.variations[0].price.toFixed(2)} - ₹{item.variations[item.variations.length - 1].price.toFixed(2)}
+                  </p>
+                  <ul className="mt-1 space-y-0.5 text-xs text-cream-muted">
+                    {item.variations.slice(0, 4).map((v) => (
+                      <li key={v.id} className="flex items-center justify-between gap-2">
+                        <span className="truncate">{v.name}</span>
+                        <span className="text-cream">₹{v.price.toFixed(2)}</span>
+                      </li>
+                    ))}
+                    {item.variations.length > 4 ? (
+                      <li className="text-cream-muted">+{item.variations.length - 4} more</li>
+                    ) : null}
+                  </ul>
+                </>
+              )}
             </div>
           ) : (
-            <p className="text-accent font-semibold mt-1 text-sm">₹{item.price.toFixed(2)}</p>
+            <div className="flex items-center justify-between gap-2">
+              <button
+                onClick={() => addItem(item)}
+                className="flex items-center gap-1 bg-accent/20 hover:bg-accent/30 text-accent px-2 py-1 rounded transition-colors"
+              >
+                <Plus className="w-3 h-3" />
+                <span className="text-xs font-semibold">₹{item.price.toFixed(2)}</span>
+              </button>
+              {normalItemQuantity > 0 && (
+                <div className="flex items-center gap-1 bg-card/50 border border-border/50 rounded px-2 py-1">
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="w-4 h-4 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center text-cream-muted hover:text-destructive transition-colors"
+                  >
+                    <span className="text-xs leading-none">−</span>
+                  </button>
+                  <span className="text-xs font-medium text-cream min-w-[12px] text-center">
+                    {normalItemQuantity}
+                  </span>
+                  <button
+                    onClick={() => addItem(item)}
+                    className="w-4 h-4 rounded-full bg-accent/20 hover:bg-accent/30 flex items-center justify-center text-accent transition-colors"
+                  >
+                    <span className="text-xs leading-none">+</span>
+                  </button>
+                </div>
+              )}
+            </div>
           )}
-        </div>
-
-        {/* Quantity Controls */}
-        <div className="flex-shrink-0">
-          <QuantityButton
-            quantity={quantity}
-            onAdd={() => addItem(item)}
-            onRemove={() => removeItem(item.id)}
-            size={isPizza ? 'md' : 'sm'}
-          />
         </div>
       </div>
     </div>

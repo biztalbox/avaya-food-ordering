@@ -39,7 +39,7 @@ const FloatingCart = () => {
             </div>
 
             <div className="flex items-center gap-3">
-              <span className="font-bold text-lg">${totalPrice.toFixed(2)}</span>
+              <span className="font-bold text-lg">₹{totalPrice.toFixed(2)}</span>
               <div className="hidden md:flex items-center gap-1.5 font-medium">
                 View Cart
                 <ArrowRight className="w-4 h-4" />

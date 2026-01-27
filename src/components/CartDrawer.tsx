@@ -11,12 +11,13 @@ const CartDrawer = () => {
     addItem, 
     removeItem, 
     totalPrice,
+    totalTax,
+    totalPriceWithTax,
     clearCart 
   } = useCart();
 
   const deliveryFee = 2.50;
-  const taxes = totalPrice * 0.08;
-  const grandTotal = totalPrice + deliveryFee + taxes;
+  const grandTotal = totalPriceWithTax + (totalPrice >= 30 ? 0 : deliveryFee);
 
   const getItemEmoji = (name: string) => {
     if (name.includes('Espresso') || name.includes('Latte') || name.includes('Cappuccino') || name.includes('Mocha') || name.includes('Americano') || name.includes('Macchiato') || name.includes('Cold') || name.includes('Flat')) return '☕';
@@ -103,13 +104,18 @@ const CartDrawer = () => {
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-cream truncate">{item.name}</h4>
-                        <p className="text-accent font-semibold mt-1">${item.price.toFixed(2)}</p>
+                        <h4 className="font-medium text-cream truncate">
+                        {item.name}
+                        {item.selectedVariation && (
+                          <span className="text-accent ml-2">({item.selectedVariation.name})</span>
+                        )}
+                      </h4>
+                        <p className="text-accent font-semibold mt-1">₹{item.price.toFixed(2)}</p>
                         
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-3 mt-2">
                           <button
-                            onClick={() => removeItem(item.id)}
+                            onClick={() => removeItem(item.id, item.selectedVariation?.id)}
                             className="w-7 h-7 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center text-cream-muted hover:text-destructive transition-colors"
                           >
                             {item.quantity === 1 ? <Trash2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
@@ -126,7 +132,7 @@ const CartDrawer = () => {
 
                       {/* Item Total */}
                       <div className="text-right">
-                        <p className="text-cream font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                        <p className="text-cream font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -141,7 +147,7 @@ const CartDrawer = () => {
                 {totalPrice < 30 && (
                   <div className="bg-accent/10 rounded-lg p-3">
                     <p className="text-xs text-accent text-center">
-                      Add ${(30 - totalPrice).toFixed(2)} more for free delivery!
+                      Add ₹{(30 - totalPrice).toFixed(2)} more for free delivery!
                     </p>
                     <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
                       <div 
@@ -156,19 +162,19 @@ const CartDrawer = () => {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between text-cream-muted">
                     <span>Subtotal</span>
-                    <span>${totalPrice.toFixed(2)}</span>
+                    <span>₹{totalPrice.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-cream-muted">
                     <span>Delivery Fee</span>
-                    <span>{totalPrice >= 30 ? 'Free' : `$${deliveryFee.toFixed(2)}`}</span>
+                    <span>{totalPrice >= 30 ? 'Free' : `₹${deliveryFee.toFixed(2)}`}</span>
                   </div>
                   <div className="flex justify-between text-cream-muted">
-                    <span>Taxes</span>
-                    <span>${taxes.toFixed(2)}</span>
+                    <span>Taxes (CGST + SGST)</span>
+                    <span>₹{totalTax.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-cream font-semibold text-lg pt-2 border-t border-border">
                     <span>Total</span>
-                    <span className="text-accent">${(totalPrice >= 30 ? grandTotal - deliveryFee : grandTotal).toFixed(2)}</span>
+                    <span className="text-accent">₹{(totalPrice >= 30 ? grandTotal - deliveryFee : grandTotal).toFixed(2)}</span>
                   </div>
                 </div>
 

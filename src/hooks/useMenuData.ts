@@ -1,12 +1,89 @@
 import { useQuery } from '@tanstack/react-query';
-import { APIMenuResponse, MenuCategory, MenuItem } from '@/types/menu';
+import { APIMenuResponse, MenuCategory, MenuItem, APITax } from '@/types/menu';
 import heroCoffee from '@/assets/hero-coffee.jpg';
-import heroBreakfast from '@/assets/hero-breakfast.jpg';
+const heroBreakfast = 'https://images.unsplash.com/photo-1542276867-c7f5032e1835?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGJyZWFrZmFzdHxlbnwwfHwwfHx8MA%3D%3D';
 import heroPizza from '@/assets/hero-pizza.jpg';
 import heroSalad from '@/assets/hero-salad.jpg';
 import heroRolls from '@/assets/hero-rolls.jpg';
 
-const PLACEHOLDER_IMAGE = '/placeholder.svg';
+// Dummy images for food items when API doesn't provide images
+const dummyFoodImages = [
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop&crop=center&q=80', // Pizza
+  'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop&crop=center&q=80', // Burger
+  'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop&crop=center&q=80', // Coffee
+  'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center&q=80', // Sandwich
+  'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop&crop=center&q=80', // Pasta
+  'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop&crop=center&q=80', // Salad
+  'https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=400&h=300&fit=crop&crop=center&q=80', // Cake
+  'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&h=300&fit=crop&crop=center&q=80', // Breakfast
+  'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop&crop=center&q=80', // Drink
+  'https://images.unsplash.com/photo-1506354666793-36e9caf08faa?w=400&h=300&fit=crop&crop=center&q=80' // Dessert
+];
+
+// Category-specific dummy images for better relevance
+const categorySpecificImages: Record<string, string[]> = {
+  coffee: [
+    'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop&crop=center&q=80'
+  ],
+  pizza: [
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&h=300&fit=crop&crop=center&q=80'
+  ],
+  breakfast: [
+    'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1506354666793-36e9caf08faa?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1534422298391-e4f8c172dddb?w=400&h=300&fit=crop&crop=center&q=80'
+  ],
+  salad: [
+    'https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=300&fit=crop&crop=center&q=80'
+  ],
+  rolls: [
+    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=400&h=300&fit=crop&crop=center&q=80',
+    'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop&crop=center&q=80'
+  ]
+};
+
+// High-quality hero images for categories when API doesn't provide images
+const dummyHeroImages = [
+  'https://images.unsplash.com/photo-1542276867-c7f5032e1835?w=1200&h=600&auto=format&fit=crop&q=80&ixlib=rb-4.1.0', // Breakfast
+  'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=1200&h=600&fit=crop&crop=center&q=80', // Coffee
+  'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1200&h=600&fit=crop&crop=center&q=80', // Pizza
+  'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=1200&h=600&fit=crop&crop=center&q=80', // Salad
+  'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&h=600&fit=crop&crop=center&q=80'  // Sandwich/Rolls
+];
+
+// Get a dummy hero image based on category name for consistency
+const getDummyHeroImage = (categoryName: string): string => {
+  const nameHash = categoryName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const index = nameHash % dummyHeroImages.length;
+  return dummyHeroImages[index];
+};
+
+// Get a dummy image based on item name for consistency
+const getDummyImage = (itemName: string, itemId: string, categoryName?: string): string => {
+  // First try to use category-specific images if category name is provided
+  if (categoryName) {
+    const normalizedName = categoryName.toLowerCase();
+    for (const [key, images] of Object.entries(categorySpecificImages)) {
+      if (normalizedName.includes(key)) {
+        const nameHash = itemName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+        const index = nameHash % images.length;
+        return images[index];
+      }
+    }
+  }
+  
+  // Fallback to general dummy images
+  const nameHash = itemName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  const index = nameHash % dummyFoodImages.length;
+  return dummyFoodImages[index];
+};
 
 // Hero images for categories (fallback)
 const categoryHeroImages: Record<string, string> = {
@@ -40,11 +117,11 @@ const getHeroImage = (categoryName: string, categoryImageUrl: string): string =>
     }
   }
   
-  // Default fallback
-  return heroCoffee;
+  // Final fallback to dummy hero images
+  return getDummyHeroImage(categoryName);
 };
 
-const fetchMenuData = async (): Promise<MenuCategory[]> => {
+const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: APITax[] }> => {
   const endpoint =
     (import.meta.env.VITE_MENU_API_URL as string | undefined) ??
     'https://avayacafe.com/online-order/api/fetchMenu.php';
@@ -93,7 +170,7 @@ const fetchMenuData = async (): Promise<MenuCategory[]> => {
           description: item.itemdescription || '',
           image: item.item_image_url && item.item_image_url.trim() !== '' 
             ? item.item_image_url 
-            : PLACEHOLDER_IMAGE,
+            : getDummyImage(item.itemname, item.itemid, category.categoryname),
           // item_attributeid: 1 = Veg, 2 = Non-Veg
           isVeg: item.item_attributeid === '1',
         };
@@ -123,7 +200,10 @@ const fetchMenuData = async (): Promise<MenuCategory[]> => {
     };
   });
   
-  return menuCategories;
+  return {
+    categories: menuCategories,
+    taxes: apiData.menu?.taxes || []
+  };
 };
 
 export const useMenuData = () => {
