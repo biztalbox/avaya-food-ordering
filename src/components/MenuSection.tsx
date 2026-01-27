@@ -1,5 +1,4 @@
 import { useRef } from 'react';
-import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { MenuCategory } from '@/types/menu';
 import { useCart } from '@/context/CartContext';
@@ -13,8 +12,8 @@ const MenuSection = ({ category }: MenuSectionProps) => {
   const { searchQuery } = useCart();
   const scrollRef = useRef<HTMLDivElement>(null);
   const isLeft = category.layout === 'left';
-  const isPizza = category.id === 'pizza';
-  const isSalad = category.id === 'salad';
+  const isPizza = category.name.toLowerCase().includes('pizza');
+  const isSalad = category.name.toLowerCase().includes('salad');
 
   // Filter items based on search
   const filteredItems = category.items.filter(item =>
@@ -73,11 +72,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
 
           {/* Text Content */}
           <div className="relative container mx-auto px-6">
-            <motion.div
-              initial={{ opacity: 0, x: isLeft ? -50 : 50 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+            <div
               className={`max-w-lg ${
                 isPizza 
                   ? 'text-center mx-auto mt-auto pt-40' 
@@ -89,10 +84,12 @@ const MenuSection = ({ category }: MenuSectionProps) => {
               <h2 className="heading-section text-cream mb-3">
                 {category.name}
               </h2>
-              <p className="text-cream-muted text-lg md:text-xl">
-                {category.tagline}
-              </p>
-            </motion.div>
+              {category.tagline ? (
+                <p className="text-cream-muted text-lg md:text-xl">
+                  {category.tagline}
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
       )}
