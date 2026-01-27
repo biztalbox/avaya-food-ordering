@@ -1,14 +1,11 @@
 // API Response Types
 export interface APIVariation {
   variationid: string;
-  variationname: string;
-  variationprice: string;
-  variationrank: string;
-  variationallowaliasname: string;
-  variationaliasname: string;
-  variation_groupid: string;
-  active: string;
-  in_stock: string;
+  name: string;
+  price: string;
+  variationrank?: string;
+  active?: string;
+  in_stock?: string;
 }
 
 export interface APIItem {
@@ -35,10 +32,12 @@ export interface APICategory {
 }
 
 export interface APIMenuResponse {
-  status: number;
-  menu: {
-    categories: APICategory[];
-    items: APIItem[];
+  success: boolean;
+  message?: string;
+  restaurant_id?: string;
+  menu?: {
+    categories?: APICategory[];
+    items?: APIItem[];
   };
 }
 

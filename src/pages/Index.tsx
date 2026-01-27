@@ -1,5 +1,4 @@
 import Header from '@/components/Header';
-import HeroLanding from '@/components/HeroLanding';
 import MenuSection from '@/components/MenuSection';
 import FloatingCart from '@/components/FloatingCart';
 import CartDrawer from '@/components/CartDrawer';
@@ -83,7 +82,6 @@ const Index = () => {
     <CartProvider>
       <div className="min-h-screen bg-background">
         <Header />
-        {/* <HeroLanding /> */}
         <MenuContent />
         <Footer />
         <FloatingCart />

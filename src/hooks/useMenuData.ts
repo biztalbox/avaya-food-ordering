@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { APIMenuResponse, MenuCategory, MenuItem } from '@/types/menu';
 import heroCoffee from '@/assets/hero-coffee.jpg';
 import heroBreakfast from '@/assets/hero-breakfast.jpg';
@@ -46,18 +45,30 @@ const getHeroImage = (categoryName: string, categoryImageUrl: string): string =>
 };
 
 const fetchMenuData = async (): Promise<MenuCategory[]> => {
-  console.log('Fetching menu via edge function...');
-  
-  const { data, error } = await supabase.functions.invoke('fetch-menu');
-  
-  if (error) {
-    console.error('Edge function error:', error);
-    throw new Error('Failed to fetch menu data');
+  const endpoint =
+    (import.meta.env.VITE_MENU_API_URL as string | undefined) ??
+    'https://avayacafe.com/online-order/api/fetchMenu.php';
+
+  const restaurantId = import.meta.env.VITE_RESTAURANT_ID as string | undefined;
+
+  const url = new URL(endpoint, window.location.origin);
+  if (restaurantId && restaurantId.trim() !== '') {
+    url.searchParams.set('restaurant_id', restaurantId.trim());
   }
 
-  const apiData: APIMenuResponse = data;
-  
-  if (!apiData || !apiData.menu) {
+  const res = await fetch(url.toString(), {
+    headers: {
+      Accept: 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Menu API request failed (${res.status})`);
+  }
+
+  const apiData = (await res.json()) as APIMenuResponse;
+
+  if (!apiData?.success || !apiData.menu) {
     throw new Error('Invalid menu data received');
   }
   
@@ -93,8 +104,8 @@ const fetchMenuData = async (): Promise<MenuCategory[]> => {
             .sort((a, b) => parseInt(a.variationrank || '0') - parseInt(b.variationrank || '0'))
             .map(v => ({
               id: v.variationid,
-              name: v.variationname,
-              price: parseFloat(v.variationprice) || 0,
+              name: v.name,
+              price: parseFloat(v.price) || 0,
             }));
         }
         
