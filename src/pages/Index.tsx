@@ -83,7 +83,7 @@ const Index = () => {
     <CartProvider>
       <div className="min-h-screen bg-background">
         <Header />
-        <HeroLanding />
+        {/* <HeroLanding /> */}
         <MenuContent />
         <Footer />
         <FloatingCart />
