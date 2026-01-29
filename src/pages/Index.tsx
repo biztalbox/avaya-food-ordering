@@ -15,7 +15,7 @@ const MenuContent = () => {
 
   if (isLoading) {
     return (
-      <main className="container mx-auto px-6 pt-32 pb-12">
+      <main className="container mx-auto px-6 pt-24 pb-12">
         <div className="space-y-8">
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-4">
@@ -34,7 +34,7 @@ const MenuContent = () => {
 
   if (error) {
     return (
-      <main className="container mx-auto px-6 pt-32 pb-12">
+      <main className="container mx-auto px-6 pt-24 pb-12">
         <div className="text-center text-cream">
           <h2 className="text-2xl font-semibold mb-2">Unable to load menu</h2>
           <p className="text-cream-muted">Please try again later.</p>
@@ -45,7 +45,7 @@ const MenuContent = () => {
 
   if (!menuCategories || menuCategories.length === 0) {
     return (
-      <main className="container mx-auto px-6 pt-32 pb-12">
+      <main className="container mx-auto px-6 pt-24 pb-12">
         <div className="text-center text-cream">
           <h2 className="text-2xl font-semibold mb-2">No menu items available</h2>
           <p className="text-cream-muted">Please check back later.</p>
@@ -68,7 +68,7 @@ const MenuContent = () => {
     : menuCategories;
 
   return (
-    <main>
+    <main className="pt-20">
       {sortedCategories.map((category) => (
         <MenuSection key={category.id} category={category} />
       ))}

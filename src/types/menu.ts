@@ -45,6 +45,41 @@ export interface APITax {
   description: string;
 }
 
+export interface APIDiscount {
+  discountid: string;
+  discountname: string;
+  discounttype: string;  // 1=Percentage, 2=Fixed, 3=BOGO OR BXGY, 7=Freebie
+  bogobuyqty: string;
+  bogogetqty: string;
+  bogotype: string;  // 1 = percentage
+  discount: string;  // discount amount
+  bogoapplicableonpurchase: string;
+  bogoapplicableonpurchaseitemids: string;
+  bogoapplicableon: string;
+  bogoapplicableonitemids: string;
+  bogoapplicableonitem: string;
+  bogoitemamountlimit: string;
+  bogopurchasediscount: string;
+  bogoapplicableonpurchaseitem: string;
+  discountordertype: string;
+  discountapplicableon: string;
+  discountdays: string;
+  discountontotal: string;
+  discountstarts: string;
+  discountends: string;
+  discounttimefrom: string;
+  discounttimeto: string;
+  discountminamount: string;
+  discountmaxamount: string;
+  freebie_item_count: string;
+  freebie_item_ids: string;
+  discounthascoupon: string;
+  discountcategoryitemids: string;
+  active: string;
+  discountmaxlimit: string;
+  rank: string;
+}
+
 export interface APIMenuResponse {
   success: boolean;
   message?: string;
@@ -61,7 +96,7 @@ export interface APIMenuResponse {
     addongroups?: any[];
     attributes?: any[];
     taxes?: APITax[];
-    discounts?: any[];
+    discounts?: APIDiscount[];
     serverdatetime?: string;
     db_version?: string;
     application_version?: string;

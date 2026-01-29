@@ -8,13 +8,13 @@
 
 @layer base {
   :root {
-    /* Palette (requested)
-      primary:   #004240 -> 178 100% 13%
-      secondary: #005755 -> 179 100% 17%
-      accent:    #B8936E -> 30 34% 58%
-      light:     #F2F2F2 -> 0 0% 95%
-      dark:      #000000 -> 0 0% 0%
-    */
+    /* Palette (requested) */
+      --primary:   #004240;
+      --secondary: #005755;
+      --accent:    #B8936E;
+      --light:     #F2F2F2;
+      --dark:      #000000;
+
     --background: 178 100% 13%;
     --foreground: 0 0% 95%;
 
@@ -245,4 +245,31 @@
   .delay-200 { animation-delay: 0.2s; }
   .delay-300 { animation-delay: 0.3s; }
   .delay-400 { animation-delay: 0.4s; }
+}
+
+
+/* ===== Custom Horizontal Scrollbar ===== */
+
+/* Chrome, Edge, Safari */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 2px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #B8936E;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #B8936E;
+}
+
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #B8936E transparent;
 }

@@ -1,10 +1,18 @@
 import { useQuery } from '@tanstack/react-query';
-import { APIMenuResponse, MenuCategory, MenuItem, APITax } from '@/types/menu';
+import { APIMenuResponse, MenuCategory, MenuItem, APITax, APIDiscount } from '@/types/menu';
 import heroCoffee from '@/assets/hero-coffee.jpg';
 const heroBreakfast = 'https://images.unsplash.com/photo-1542276867-c7f5032e1835?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGJyZWFrZmFzdHxlbnwwfHwwfHx8MA%3D%3D';
 import heroPizza from '@/assets/hero-pizza.jpg';
 import heroSalad from '@/assets/hero-salad.jpg';
 import heroRolls from '@/assets/hero-rolls.jpg';
+
+// Restaurant data interface
+export interface RestaurantData {
+  restID: string;
+  res_name: string;
+  address: string;
+  contact_information: string;
+}
 
 // Dummy images for food items when API doesn't provide images
 const dummyFoodImages = [
@@ -121,7 +129,7 @@ const getHeroImage = (categoryName: string, categoryImageUrl: string): string =>
   return getDummyHeroImage(categoryName);
 };
 
-const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: APITax[] }> => {
+const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: APITax[], discounts: APIDiscount[] }> => {
   const endpoint =
     (import.meta.env.VITE_MENU_API_URL as string | undefined) ??
     'https://avayacafe.com/online-order/api/fetchMenu.php';
@@ -200,9 +208,26 @@ const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: API
     };
   });
   
+  // Extract and store restaurant details in localStorage
+  const restaurantDetails = apiData.menu?.restaurants?.[0]?.details;
+  
+  if (restaurantDetails) {
+    const restaurantData: RestaurantData = {
+      restID: apiData.restaurant_id || restaurantDetails.restaurantid || 'xxxxxx',
+      res_name: restaurantDetails.restaurantname || 'Unknown Restaurant',
+      address: restaurantDetails.address || 'Address not available',
+      contact_information: restaurantDetails.contact || 'Contact not available'
+    };
+    
+    // Store restaurant data in localStorage
+    localStorage.setItem('restaurantData', JSON.stringify(restaurantData));
+    console.log('Restaurant data stored in localStorage:', restaurantData);
+  }
+  
   return {
     categories: menuCategories,
-    taxes: apiData.menu?.taxes || []
+    taxes: apiData.menu?.taxes || [],
+    discounts: apiData.menu?.discounts || []
   };
 };
 
@@ -214,4 +239,18 @@ export const useMenuData = () => {
     refetchOnWindowFocus: false,
     retry: 2,
   });
+};
+
+// Hook to get restaurant data from localStorage
+export const useRestaurantData = (): RestaurantData | null => {
+  try {
+    const storedData = localStorage.getItem('restaurantData');
+    if (storedData) {
+      return JSON.parse(storedData) as RestaurantData;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error reading restaurant data from localStorage:', error);
+    return null;
+  }
 };

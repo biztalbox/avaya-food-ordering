@@ -11,6 +11,8 @@ interface CartContextType {
   totalPrice: number;
   totalTax: number;
   totalPriceWithTax: number;
+  totalDiscount: number;
+  totalPriceWithDiscount: number;
   clearCart: () => void;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
@@ -30,6 +32,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const { data: menuData } = useMenuData();
   const taxes = menuData?.taxes || [];
+  const discounts = menuData?.discounts || [];
 
   const addItem = useCallback((item: MenuItem) => {
     setItems(prev => {
@@ -94,6 +97,40 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, 0);
   
   const totalPriceWithTax = totalPrice + totalTax;
+  
+  // Calculate discounts
+  const totalDiscount = discounts.reduce((sum, discount) => {
+    if (discount.active !== 'true') return sum;
+    
+    const discountType = parseInt(discount.discounttype);
+    const discountAmount = parseFloat(discount.discount);
+    const minAmount = parseFloat(discount.discountminamount);
+    const maxAmount = parseFloat(discount.discountmaxamount);
+    
+    // Check if order meets minimum amount requirement
+    if (totalPrice < minAmount) return sum;
+    
+    let calculatedDiscount = 0;
+    
+    if (discountType === 1) { // Percentage discount
+      calculatedDiscount = (totalPrice * discountAmount) / 100;
+    } else if (discountType === 2) { // Fixed discount
+      calculatedDiscount = discountAmount;
+    }
+    
+    // Apply maximum discount limit if specified
+    if (maxAmount > 0 && calculatedDiscount > maxAmount) {
+      calculatedDiscount = maxAmount;
+    }
+    
+    return sum + calculatedDiscount;
+  }, 0);
+
+  // Temporary 20% discount for all items (will be replaced by API discounts when available)
+  const tempDiscount = discounts.length === 0 ? (totalPrice * 0.20) : 0;
+  const finalTotalDiscount = totalDiscount + tempDiscount;
+  
+  const totalPriceWithDiscount = totalPriceWithTax - finalTotalDiscount;
 
   const clearCart = useCallback(() => setItems([]), []);
 
@@ -107,6 +144,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       totalPrice,
       totalTax,
       totalPriceWithTax,
+      totalDiscount: finalTotalDiscount,
+      totalPriceWithDiscount,
       clearCart,
       isCartOpen,
       setIsCartOpen,

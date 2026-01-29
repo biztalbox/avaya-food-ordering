@@ -28,10 +28,10 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
   return (
     <div
       className={`
-        relative bg-gradient-card rounded-xl overflow-hidden
+        relative bg-[#005755] rounded-xl overflow-hidden
         shadow-card
         ${isPizza ? 'p-4' : 'p-3'}
-        ${normalItemQuantity > 0 || getVariationQuantity(item.variations?.[0]?.id || '') > 0 || getVariationQuantity(item.variations?.[1]?.id || '') > 0 ? 'ring-2 ring-accent' : 'ring-1 ring-border/30'}
+        ring-1 ring-border/30
       `}
     >
       <div className="flex items-center gap-3">
@@ -100,7 +100,7 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                               };
                               addItem(itemWithVariation);
                             }}
-                            className="flex items-center gap-1 bg-accent/20 hover:bg-accent/30 text-accent px-2 py-1 rounded transition-colors"
+                            className="flex items-center gap-1 bg-[#004240] hover:bg-[#004240] text-[#B8936E] px-2 py-1 rounded transition-colors"
                           >
                             <Plus className="w-3 h-3" />
                             <span className="text-xs font-semibold">₹{variation.price.toFixed(2)}</span>
@@ -129,7 +129,7 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                                   };
                                   addItem(itemWithVariation);
                                 }}
-                                className="w-4 h-4 rounded-full bg-accent/20 hover:bg-accent/30 flex items-center justify-center text-accent transition-colors"
+                                className="w-4 h-4 rounded-full bg-[#004240] hover:bg-[#004240] flex items-center justify-center text-[#B8936E] transition-colors"
                               >
                                 <span className="text-xs leading-none">+</span>
                               </button>
@@ -160,10 +160,10 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => addItem(item)}
-                className="flex items-center gap-1 bg-accent/20 hover:bg-accent/30 text-accent px-2 py-1 rounded transition-colors"
+                className="flex items-center gap-1 bg-[#004240] hover:bg-[#004240] text-[#B8936E] px-2 py-1 rounded transition-colors"
               >
                 <Plus className="w-3 h-3" />
                 <span className="text-xs font-semibold">₹{item.price.toFixed(2)}</span>
@@ -181,7 +181,7 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                   </span>
                   <button
                     onClick={() => addItem(item)}
-                    className="w-4 h-4 rounded-full bg-accent/20 hover:bg-accent/30 flex items-center justify-center text-accent transition-colors"
+                    className="w-4 h-4 rounded-full bg-[#004240] hover:bg-[#004240] flex items-center justify-center text-[#B8936E] transition-colors"
                   >
                     <span className="text-xs leading-none">+</span>
                   </button>

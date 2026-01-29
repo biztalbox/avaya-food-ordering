@@ -21,34 +21,43 @@ const Header = () => {
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled 
-          ? 'bg-background/95 backdrop-blur-md shadow-lg' 
-          : 'bg-transparent'
-      }`}
+      className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border/50 shadow-lg"
     >
-      <div className="container mx-auto px-6 py-4">
-        {/* Top row with logo and menu button */}
+      <div className="container mx-auto px-6 py-3">
+        {/* Top row with logo, centered search bar and menu button */}
         <div className="flex items-center justify-between">
-          {/* Logo - moved to left */}
+          {/* Logo */}
           <motion.div 
-            className="text-left"
+            className="flex-shrink-0"
             whileHover={{ scale: 1.02 }}
           >
-            <h1 className="font-serif text-2xl md:text-3xl font-semibold text-cream tracking-wider">
-              avaya
-            </h1>
-            <p className="text-[10px] md:text-xs text-accent tracking-[0.3em] uppercase">
-              cafe & bakery
-            </p>
+            <img 
+              src="https://avayacafe.com/wp-content/uploads/2025/11/logo-1.png.webp" 
+              alt="Avaya Cafe & Bakery"
+              className="h-8 w-auto"
+            />
           </motion.div>
 
-          {/* Menu Button */}
+          {/* Search Bar - centered */}
+          <div className="flex-1 max-w-md mx-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                type="text"
+                placeholder="Search for food items..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-card/50 border-transparent focus:border-transparent focus:ring-0 text-cream placeholder:text-muted-foreground"
+              />
+            </div>
+          </div>
+
+          {/* Menu Button - right corner */}
           <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setMenuOpen(!menuOpen)}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-card/50 hover:bg-card transition-colors"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-card/50 hover:bg-card transition-colors flex-shrink-0"
           >
             {menuOpen ? (
               <X className="w-5 h-5 text-cream" />
@@ -56,20 +65,6 @@ const Header = () => {
               <Menu className="w-5 h-5 text-cream" />
             )}
           </motion.button>
-        </div>
-
-        {/* Search Bar - centered */}
-        <div className="mt-4 flex justify-center">
-          <div className="relative max-w-md w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              type="text"
-              placeholder="Search for food items..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 bg-card/50 border-border/50 focus:border-accent text-cream placeholder:text-muted-foreground"
-            />
-          </div>
         </div>
       </div>
 

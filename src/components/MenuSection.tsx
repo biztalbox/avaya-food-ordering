@@ -50,7 +50,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
     <section id={category.id} className={`${getBgClass()} py-0`}>
       {/* Hero Block - hide when searching */}
       {!searchQuery && (
-        <div className={`relative min-h-[50vh] md:min-h-[60vh] flex items-center ${isPizza ? 'min-h-[70vh]' : ''}`}>
+        <div className={`relative min-h-[150px] md:min-h-[260px] flex items-center ${isPizza ? 'min-h-[70vh]' : ''}`}>
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
@@ -65,13 +65,12 @@ const MenuSection = ({ category }: MenuSectionProps) => {
           {/* Text Content */}
           <div className="relative container mx-auto px-6">
             <div
-              className={`max-w-lg ${
-                isPizza 
-                  ? 'text-center mx-auto mt-auto pt-40' 
-                  : isLeft 
-                    ? 'mr-auto' 
+              className={`max-w-lg ${isPizza
+                  ? 'text-center mx-auto mt-auto pt-40'
+                  : isLeft
+                    ? 'mr-auto'
                     : 'ml-auto text-right'
-              }`}
+                }`}
             >
               <h2 className="heading-section text-white mb-3 drop-shadow-lg">
                 {category.name}
@@ -94,7 +93,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
       )}
 
       {/* Items Carousel */}
-      <div className="container mx-auto px-6 py-8 md:py-12">
+      <div className="container mx-auto px-6 py-24 md:py-28">
         <div className="relative group">
           {/* Left Arrow */}
           <button
@@ -115,18 +114,16 @@ const MenuSection = ({ category }: MenuSectionProps) => {
           {/* Scrollable Container */}
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2 snap-x snap-mandatory"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex gap-4 overflow-x-scroll pb-2 -mx-2 px-2 custom-scrollbar"
           >
             {filteredItems.map((item, index) => (
               <div
                 key={item.id}
-                className={`flex-shrink-0 snap-start ${
-                  isPizza ? 'w-[280px] md:w-[320px]' : 'w-[260px] md:w-[300px]'
-                }`}
+                className={`flex-shrink-0 snap-start ${isPizza ? 'w-[280px] md:w-[320px]' : 'w-[260px] md:w-[300px]'
+                  }`}
               >
-                <MenuItemCard 
-                  item={item} 
+                <MenuItemCard
+                  item={item}
                   index={index}
                   isPizza={isPizza}
                 />

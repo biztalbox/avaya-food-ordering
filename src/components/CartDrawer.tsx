@@ -3,21 +3,22 @@ import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 
 const CartDrawer = () => {
-  const { 
-    items, 
-    isCartOpen, 
-    setIsCartOpen, 
+  const {
+    items,
+    isCartOpen,
+    setIsCartOpen,
     setIsCheckoutOpen,
-    addItem, 
-    removeItem, 
+    addItem,
+    removeItem,
     totalPrice,
     totalTax,
     totalPriceWithTax,
-    clearCart 
+    totalDiscount,
+    totalPriceWithDiscount,
+    clearCart
   } = useCart();
 
-  const deliveryFee = 2.50;
-  const grandTotal = totalPriceWithTax + (totalPrice >= 30 ? 0 : deliveryFee);
+  const grandTotal = totalPriceWithDiscount;
 
   const getItemEmoji = (name: string) => {
     if (name.includes('Espresso') || name.includes('Latte') || name.includes('Cappuccino') || name.includes('Mocha') || name.includes('Americano') || name.includes('Macchiato') || name.includes('Cold') || name.includes('Flat')) return '☕';
@@ -95,23 +96,25 @@ const CartDrawer = () => {
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, x: 50 }}
-                      className="flex gap-4 bg-gradient-card rounded-xl p-4 border border-border/30"
+                      className="flex gap-4  rounded-md border-[#B8936E] p-4 border border-border/30"
                     >
-                      {/* Item Image */}
-                      <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center text-2xl flex-shrink-0">
-                        {getItemEmoji(item.name)}
-                      </div>
+                        <img
+                          className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                          src={item.image && item.image.trim() !== '' ? item.image : '/sample_dish.jpg'}
+                          onError={(e) => { e.currentTarget.src = '/sample_dish.jpg'; }}
+                        />
+                    
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-cream truncate">
-                        {item.name}
-                        {item.selectedVariation && (
-                          <span className="text-accent ml-2">({item.selectedVariation.name})</span>
-                        )}
-                      </h4>
+                          {item.name}
+                          {item.selectedVariation && (
+                            <span className="text-accent ml-2">({item.selectedVariation.name})</span>
+                          )}
+                        </h4>
                         <p className="text-accent font-semibold mt-1">₹{item.price.toFixed(2)}</p>
-                        
+
                         {/* Quantity Controls */}
                         <div className="flex items-center gap-3 mt-2">
                           <button
@@ -144,29 +147,23 @@ const CartDrawer = () => {
             {items.length > 0 && (
               <div className="border-t border-border p-6 space-y-4">
                 {/* Progress to free delivery */}
-                {totalPrice < 30 && (
-                  <div className="bg-accent/10 rounded-lg p-3">
-                    <p className="text-xs text-accent text-center">
-                      Add ₹{(30 - totalPrice).toFixed(2)} more for free delivery!
+                {totalPrice < 30 && totalDiscount > 0 && (
+                  <div className="bg-green-500/10 rounded-lg p-3">
+                    <p className="text-xs text-green-500 text-center">
+                      You saved ₹{totalDiscount.toFixed(2)} on this order!
                     </p>
-                    <div className="mt-2 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-accent rounded-full transition-all"
-                        style={{ width: `${Math.min((totalPrice / 30) * 100, 100)}%` }}
-                      />
-                    </div>
                   </div>
                 )}
 
                 {/* Pricing */}
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between text-cream-muted">
+                <div className="bg-[#004240] rounded-xl p-4 space-y-2 text-sm">
+                  <div className="flex justify-between text-cream">
                     <span>Subtotal</span>
                     <span>₹{totalPrice.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-cream-muted">
-                    <span>Delivery Fee</span>
-                    <span>{totalPrice >= 30 ? 'Free' : `₹${deliveryFee.toFixed(2)}`}</span>
+                    <span>Discount {totalDiscount > 0 && `(${((totalDiscount / (totalPrice + totalTax)) * 100).toFixed(0)}%)`}</span>
+                    <span className="text-green-500">-₹{totalDiscount.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-cream-muted">
                     <span>Taxes (CGST + SGST)</span>
@@ -174,7 +171,7 @@ const CartDrawer = () => {
                   </div>
                   <div className="flex justify-between text-cream font-semibold text-lg pt-2 border-t border-border">
                     <span>Total</span>
-                    <span className="text-accent">₹{(totalPrice >= 30 ? grandTotal - deliveryFee : grandTotal).toFixed(2)}</span>
+                    <span className="text-accent">₹{grandTotal.toFixed(2)}</span>
                   </div>
                 </div>
 
