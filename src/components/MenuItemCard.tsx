@@ -5,12 +5,13 @@ import { useCart } from '@/context/CartContext';
 interface MenuItemCardProps {
   item: MenuItem;
   index: number;
-  isPizza?: boolean;
 }
 
 const PLACEHOLDER_IMAGE = import.meta.env.VITE_BASE_URL + 'placeholder.jpg';
+const veg_img = import.meta.env.VITE_BASE_URL + 'veg.png';
+const non_veg_img = import.meta.env.VITE_BASE_URL + 'non-veg.png';
 
-const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
+const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
   const { addItem, removeItem, getItemQuantity } = useCart();
   
   // Calculate quantities for each variation
@@ -25,21 +26,11 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
 
   return (
     <div
-      className={`
-        relative bg-[#005755] rounded-xl overflow-hidden
-        shadow-card
-        ${isPizza ? 'p-4' : 'p-4'}
-        ring-1 ring-border/30
-        h-[120px] sm:h-[130px]
-      `}
+      className="relative bg-secondary rounded-xl overflow-hidden shadow-card p-4 ring-1 ring-border/30"
     >
-      <div className="flex items-center gap-3">
+      <div className="flex gap-3">
         {/* Item Image */}
-        <div className={`
-          ${isPizza ? 'w-20 h-20' : 'w-16 h-16'}
-          rounded-full bg-muted flex-shrink-0 flex items-center justify-center
-          overflow-hidden
-        `}>
+        <div className="w-16 h-16 rounded-full bg-muted flex-shrink-0 flex items-center justify-center overflow-hidden">
           {hasImage ? (
             <img 
               src={item.image} 
@@ -55,43 +46,42 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
         </div>
 
         {/* Item Details */}
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-1 w-full flex-grow">
+          <div className="flex items-center gap-1">
             {/* Veg/Non-Veg Indicator */}
-            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
-              item.isVeg ? 'bg-green-500' : 'bg-red-500'
-            }`} />
+            <img src={item.isVeg ? veg_img : non_veg_img} alt="Veg/Non-Veg" className={`w-4 h-4`} />
             
-            <h4 className={`font-medium text-cream truncate ${isPizza ? 'text-lg' : 'text-base'}`}>
-              {item.name}
+            <h4 className="font-medium text-cream truncate text-base">
+              {item.name.length > 20 ? item.name.slice(0, 20) + '...' : item.name}
             </h4>
-            {item.isVeg !== undefined && (
+            {/* {item.isVeg !== undefined && (
               <span className={`flex-shrink-0 ${item.isVeg ? 'text-green-400' : 'text-orange-400'}`}>
                 {item.isVeg ? <Leaf className="w-3.5 h-3.5" /> : <Drumstick className="w-3.5 h-3.5" />}
               </span>
-            )}
+            )} */}
           </div>
-          {item.description && (
+
+          {/* {item.description && (
             <p className="text-sm text-cream-muted mt-1 truncate">{item.description}</p>
-          )}
+          )} */}
           
           {/* Show variations if available */}
           {item.variations && item.variations.length > 0 ? (
-            <div className="mt-1">
+            <div className="flex flex-col gap-1">
               {/* Check if it's half plate/full plate pattern */}
               {item.variations.length === 2&& 
                item.variations.some(v => v.name.toLowerCase().includes('half')) &&
                item.variations.some(v => v.name.toLowerCase().includes('full')) ? (
-                <div className="space-y-1">
+                <div className="flex flex-col gap-1">
                   {item.variations.map((variation) => {
                     const variationQuantity = getVariationQuantity(variation.id);
                     return (
                       <div key={variation.id} className="flex items-center justify-between gap-2">
-                        <span className="text-sm text-cream-muted capitalize">
+                        <span className="text-xs text-cream-muted">
                           {variation.name}
                         </span>
-                        <div className="flex items-center gap-1">
-                          <button
+                        <div className="flex items-center gap-2">
+                          {/* <button
                             onClick={() => {
                               const itemWithVariation = {
                                 ...item,
@@ -107,15 +97,15 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                             className="flex items-center gap-1 bg-[#004240] hover:bg-[#004240] text-[#B8936E] px-2 py-1 rounded transition-colors"
                           >
                             <Plus className="w-3 h-3" />
-                            <span className="text-sm font-semibold">₹{variation.price.toFixed(2)}</span>
-                          </button>
-                          {variationQuantity > 0 && (
-                            <div className="flex items-center gap-1 bg-card/50 border border-border/50 rounded px-2 py-1">
+                          </button> */}
+                            <span className="text-sm text-accent font-semibold">₹{variation.price.toFixed(2)}</span>
+                          {/* {variationQuantity > 0 && ( */}
+                            <div className="flex items-center gap-1">
                               <button
                                 onClick={() => removeItem(item.id, variation.id)}
-                                className="w-4 h-4 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center text-cream-muted hover:text-destructive transition-colors"
+                                className="w-6 h-6 rounded-full bg-black/30 flex items-center justify-center text-white"
                               >
-                                <span className="text-xs leading-none">−</span>
+                                <span className="text-base -mt-1 leading-none">−</span>
                               </button>
                               <span className="text-xs font-medium text-cream min-w-[12px] text-center">
                                 {variationQuantity}
@@ -133,12 +123,12 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                                   };
                                   addItem(itemWithVariation);
                                 }}
-                                className="w-4 h-4 rounded-full bg-[#004240] hover:bg-[#004240] flex items-center justify-center text-[#B8936E] transition-colors"
+                                className="w-6 h-6 rounded-full bg-black/30 flex items-center justify-center text-white"
                               >
-                                <span className="text-xs leading-none">+</span>
+                                <span className="text-base -mt-1 leading-none">+</span>
                               </button>
                             </div>
-                          )}
+                          {/* )} */}
                         </div>
                       </div>
                     );
@@ -164,33 +154,33 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
               )}
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <button
+            <div className="flex items-center justify-between gap-2">
+              {/* <button
                 onClick={() => addItem(item)}
                 className="flex items-center gap-1 bg-[#004240] hover:bg-[#004240] text-[#B8936E] px-2 py-1 rounded transition-colors"
               >
                 <Plus className="w-3 h-3" />
-                <span className="text-sm font-semibold">₹{item.price.toFixed(2)}</span>
-              </button>
-              {normalItemQuantity > 0 && (
-                <div className="flex items-center gap-1 bg-card/50 border border-border/50 rounded px-2 py-1">
+              </button> */}
+                <span className="text-sm text-accent font-semibold">₹{item.price.toFixed(2)}</span>
+              {/* {normalItemQuantity > 0 && ( */}
+                <div className="flex items-center gap-2">
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="w-4 h-4 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center text-cream-muted hover:text-destructive transition-colors"
+                    className="w-6 h-6 rounded-full bg-black/30 flex items-center justify-center text-white"
                   >
-                    <span className="text-xs leading-none">−</span>
+                    <span className="text-base -mt-1 leading-none">−</span>
                   </button>
-                  <span className="text-xs font-medium text-cream min-w-[12px] text-center">
+                  <span className="text-base font-medium text-cream min-w-[12px] text-center">
                     {normalItemQuantity}
                   </span>
                   <button
                     onClick={() => addItem(item)}
-                    className="w-4 h-4 rounded-full bg-[#004240] hover:bg-[#004240] flex items-center justify-center text-[#B8936E] transition-colors"
+                    className="w-6 h-6 rounded-full bg-black/30 flex items-center justify-center text-white"
                   >
-                    <span className="text-xs leading-none">+</span>
+                    <span className="text-base leading-none">+</span>
                   </button>
                 </div>
-              )}
+              {/* )} */}
             </div>
           )}
         </div>

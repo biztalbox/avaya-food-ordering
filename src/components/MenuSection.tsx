@@ -12,8 +12,6 @@ const MenuSection = ({ category }: MenuSectionProps) => {
   const { searchQuery, filterType } = useCart();
   const scrollRef = useRef<HTMLDivElement>(null);
   const isLeft = category.layout === 'left';
-  const isPizza = category.name.toLowerCase().includes('pizza');
-  const isSalad = category.name.toLowerCase().includes('salad');
 
   // Filter items based on search and veg/non-veg filter
   const filteredItems = category.items.filter(item => {
@@ -62,7 +60,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
         <section id={category.id} className={`${getBgClass()} py-0`}>
       {/* Hero Block - hide when searching */}
       {!searchQuery && (
-        <div className={`relative min-h-[120px] md:min-h-[180px] flex items-center ${isPizza ? 'min-h-[50vh]' : ''}`}>
+        <div className={`relative min-h-[120px] md:min-h-[180px] flex items-center`}>
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
@@ -78,14 +76,9 @@ const MenuSection = ({ category }: MenuSectionProps) => {
           {/* Text Content */}
           <div className="relative container mx-auto px-6">
             <div
-              className={`max-w-lg ${isPizza
-                  ? 'text-center mx-auto mt-auto pt-40'
-                  : isLeft
-                    ? 'mr-auto'
-                    : 'ml-auto text-right'
-                }`}
+              className={`max-w-lg ${isLeft ? 'mr-auto' : 'ml-auto text-right'}`}
             >
-              <h2 className="text-3xl uppercase font-normal tracking-wider text-white mb-3 drop-shadow-lg">
+              <h2 className="text-3xl uppercase stroke-2 stroke-white font-normal tracking-wider text-white mb-3 drop-shadow-lg">
                 {category.name}
               </h2>
               {category.tagline ? (
@@ -106,7 +99,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
       )}
 
       {/* Items Carousel */}
-      <div className="container mx-auto px-6 py-8 md:py-12">
+      <div className="container mx-auto px-6 pt-8 pb-24">
         <div className="relative group">
           {/* Left Arrow */}
           <button
@@ -132,13 +125,11 @@ const MenuSection = ({ category }: MenuSectionProps) => {
             {filteredItems.map((item, index) => (
               <div
                 key={item.id}
-                className={`flex-shrink-0 snap-start ${isPizza ? 'w-[300px] md:w-[340px]' : 'w-[280px] md:w-[320px]'
-                  }`}
+                className="flex-shrink-0 snap-start w-[280px] md:w-[320px]"
               >
                 <MenuItemCard
                   item={item}
                   index={index}
-                  isPizza={isPizza}
                 />
               </div>
             ))}
