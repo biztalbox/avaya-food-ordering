@@ -21,9 +21,12 @@ const Header = () => {
     setCartFilterType(filterType);
   }, [filterType, setCartFilterType]);
 
+const veg_img = import.meta.env.VITE_BASE_URL + 'veg.png';
+const non_veg_img = import.meta.env.VITE_BASE_URL + 'non-veg.png';
+
   return (
     <section
-      className="sticky top-0 z-50 bg-background border-b border-border/40 w-full"
+      className="sticky top-0 z-50 bg-background border-b border-accent w-full"
     >
       <div className="container mx-auto px-6 py-5">
 
@@ -53,7 +56,7 @@ const Header = () => {
                 placeholder="Search for food items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 p-6 pl-10 bg-card/50 border border-accent/70 focus:ring-0"
+                className="h-10 p-6 pl-10 bg-card/50 border border-accent/70 focus:ring-0 focus:outline-none"
               />
             </div>
           </div>
@@ -65,7 +68,7 @@ const Header = () => {
               <button
                 onClick={() => setFilterType('all')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${filterType === 'all'
-                    ? 'bg-accent text-accent-foreground'
+                    ? 'bg-secondary text-accent'
                     : 'text-muted-foreground hover:text-foreground'
                   }`}
               >
@@ -75,22 +78,22 @@ const Header = () => {
               <button
                 onClick={() => setFilterType('veg')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-2 ${filterType === 'veg'
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-secondary text-white'
                     : 'text-muted-foreground hover:text-green-400'
                   }`}
               >
-                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <img src={veg_img} alt="Veg" className="w-5 h-5" />
                 Veg
               </button>
 
               <button
                 onClick={() => setFilterType('non-veg')}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-2 ${filterType === 'non-veg'
-                    ? 'bg-red-500 text-white'
+                    ? 'bg-secondary text-white'
                     : 'text-muted-foreground hover:text-red-400'
                   }`}
               >
-                <span className="w-2 h-2 rounded-full bg-red-500" />
+                <img src={non_veg_img} alt="Non-Veg" className="w-5 h-5" />
                 Non-Veg
               </button>
 

@@ -57,7 +57,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
   const SampleCategoryImage = import.meta.env.VITE_BASE_URL + 'sample_cat.jpeg';
 
   return (
-        <section id={category.id} className={`${getBgClass()} py-0`}>
+        <section id={category.id} className={`${getBgClass()}`}>
       {/* Hero Block - hide when searching */}
       {!searchQuery && (
         <div className={`relative min-h-[120px] md:min-h-[180px] flex items-center`}>

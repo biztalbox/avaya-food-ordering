@@ -70,7 +70,7 @@ const MenuContent = () => {
     : menuCategories;
 
   return (
-    <main className="">
+    <main className="min-h-screen">
       {sortedCategories.map((category) => (
         <MenuSection key={category.id} category={category} />
       ))}
