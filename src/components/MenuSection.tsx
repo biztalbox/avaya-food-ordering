@@ -46,6 +46,8 @@ const MenuSection = ({ category }: MenuSectionProps) => {
     }
   };
 
+  const SampleCategoryImage = import.meta.env.VITE_BASE_URL + 'sample_cat.jpeg';
+
   return (
     <section id={category.id} className={`${getBgClass()} py-0`}>
       {/* Hero Block - hide when searching */}
@@ -54,12 +56,13 @@ const MenuSection = ({ category }: MenuSectionProps) => {
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
-              src={category.heroImage}
+              src={category.heroImage && category.heroImage.trim() !== '' ? category.heroImage : SampleCategoryImage}
               alt={category.name}
               className="w-full h-full object-cover"
+              onError={(e) => { (e.target as HTMLImageElement).src = SampleCategoryImage; }}
             />
             {/* Minimal overlay for text readability */}
-            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-0 bg-black/60" />
           </div>
 
           {/* Text Content */}
@@ -72,7 +75,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
                     : 'ml-auto text-right'
                 }`}
             >
-              <h2 className="heading-section text-white mb-3 drop-shadow-lg">
+              <h2 className="text-3xl uppercase font-normal tracking-wider text-white mb-3 drop-shadow-lg">
                 {category.name}
               </h2>
               {category.tagline ? (
@@ -88,7 +91,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
       {/* Search result header */}
       {searchQuery && (
         <div className="container mx-auto px-6 pt-8">
-          <h3 className="text-xl font-semibold text-cream">{category.name}</h3>
+          <h3 className="text-xl font-semibold text-light">{category.name}</h3>
         </div>
       )}
 

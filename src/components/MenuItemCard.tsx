@@ -1,8 +1,6 @@
 import { Leaf, Drumstick, Plus } from 'lucide-react';
 import { MenuItem } from '@/types/menu';
 import { useCart } from '@/context/CartContext';
-import QuantityButton from './QuantityButton';
-import { useState } from 'react';
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -10,7 +8,7 @@ interface MenuItemCardProps {
   isPizza?: boolean;
 }
 
-const PLACEHOLDER_IMAGE = '/placeholder.svg';
+const PLACEHOLDER_IMAGE = import.meta.env.VITE_BASE_URL + 'placeholder.jpg';
 
 const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
   const { addItem, removeItem, getItemQuantity } = useCart();
