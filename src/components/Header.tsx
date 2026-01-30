@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X, Search, Leaf, Drumstick } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/context/CartContext';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const { searchQuery, setSearchQuery } = useCart();
+  const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
+  const { searchQuery, setSearchQuery, setFilterType: setCartFilterType } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +17,10 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  useEffect(() => {
+    setCartFilterType(filterType);
+  }, [filterType, setCartFilterType]);
 
   return (
     <motion.header
@@ -65,6 +70,44 @@ const Header = () => {
               <Menu className="w-5 h-5 text-cream" />
             )}
           </motion.button>
+        </div>
+
+        {/* Veg/Non-Veg Filter Toggle */}
+        <div className="flex items-center justify-center mt-3">
+          <div className="inline-flex items-center bg-card/50 rounded-full p-1 border border-border/30">
+            <button
+              onClick={() => setFilterType('all')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                filterType === 'all'
+                  ? 'bg-accent text-accent-foreground'
+                  : 'text-cream-muted hover:text-cream'
+              }`}
+            >
+              All Items
+            </button>
+            <button
+              onClick={() => setFilterType('veg')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                filterType === 'veg'
+                  ? 'bg-green-500 text-white'
+                  : 'text-cream-muted hover:text-green-400'
+              }`}
+            >
+              <Leaf className="w-4 h-4" />
+              Veg
+            </button>
+            <button
+              onClick={() => setFilterType('non-veg')}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                filterType === 'non-veg'
+                  ? 'bg-red-500 text-white'
+                  : 'text-cream-muted hover:text-red-400'
+              }`}
+            >
+              <Drumstick className="w-4 h-4" />
+              Non-Veg
+            </button>
+          </div>
         </div>
       </div>
 

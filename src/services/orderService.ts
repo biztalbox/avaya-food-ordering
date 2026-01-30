@@ -26,6 +26,8 @@ export interface OrderData {
   tax: number;
   discount: number;
   total: number;
+  table_no?: string;
+  description?: string;
 }
 
 // Restaurant interface (keeping for backward compatibility)
@@ -50,6 +52,12 @@ export interface SaveOrderRequest {
         details: {
           name: string;
           phone: string;
+        };
+      };
+      Order: {
+        details: {
+          table_no: string;
+          description: string;
         };
       };
       OrderItem: {
@@ -214,6 +222,12 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
           details: {
             name: orderData.customer_name,
             phone: orderData.customer_phone
+          }
+        },
+        Order: {
+          details: {
+            table_no: orderData.table_no || '',
+            description: orderData.description || ''
           }
         },
         OrderItem: {

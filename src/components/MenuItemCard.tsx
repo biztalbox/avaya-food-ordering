@@ -30,14 +30,15 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
       className={`
         relative bg-[#005755] rounded-xl overflow-hidden
         shadow-card
-        ${isPizza ? 'p-4' : 'p-3'}
+        ${isPizza ? 'p-4' : 'p-4'}
         ring-1 ring-border/30
+        h-[120px] sm:h-[130px]
       `}
     >
       <div className="flex items-center gap-3">
         {/* Item Image */}
         <div className={`
-          ${isPizza ? 'w-16 h-16' : 'w-12 h-12'}
+          ${isPizza ? 'w-20 h-20' : 'w-16 h-16'}
           rounded-full bg-muted flex-shrink-0 flex items-center justify-center
           overflow-hidden
         `}>
@@ -58,7 +59,12 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
         {/* Item Details */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className={`font-medium text-cream truncate ${isPizza ? 'text-base' : 'text-sm'}`}>
+            {/* Veg/Non-Veg Indicator */}
+            <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
+              item.isVeg ? 'bg-green-500' : 'bg-red-500'
+            }`} />
+            
+            <h4 className={`font-medium text-cream truncate ${isPizza ? 'text-lg' : 'text-base'}`}>
               {item.name}
             </h4>
             {item.isVeg !== undefined && (
@@ -68,14 +74,14 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
             )}
           </div>
           {item.description && (
-            <p className="text-xs text-cream-muted mt-0.5 truncate">{item.description}</p>
+            <p className="text-sm text-cream-muted mt-1 truncate">{item.description}</p>
           )}
           
           {/* Show variations if available */}
           {item.variations && item.variations.length > 0 ? (
             <div className="mt-1">
               {/* Check if it's half plate/full plate pattern */}
-              {item.variations.length === 2 && 
+              {item.variations.length === 2&& 
                item.variations.some(v => v.name.toLowerCase().includes('half')) &&
                item.variations.some(v => v.name.toLowerCase().includes('full')) ? (
                 <div className="space-y-1">
@@ -83,7 +89,7 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                     const variationQuantity = getVariationQuantity(variation.id);
                     return (
                       <div key={variation.id} className="flex items-center justify-between gap-2">
-                        <span className="text-xs text-cream-muted capitalize">
+                        <span className="text-sm text-cream-muted capitalize">
                           {variation.name}
                         </span>
                         <div className="flex items-center gap-1">
@@ -103,7 +109,7 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                             className="flex items-center gap-1 bg-[#004240] hover:bg-[#004240] text-[#B8936E] px-2 py-1 rounded transition-colors"
                           >
                             <Plus className="w-3 h-3" />
-                            <span className="text-xs font-semibold">₹{variation.price.toFixed(2)}</span>
+                            <span className="text-sm font-semibold">₹{variation.price.toFixed(2)}</span>
                           </button>
                           {variationQuantity > 0 && (
                             <div className="flex items-center gap-1 bg-card/50 border border-border/50 rounded px-2 py-1">
@@ -142,10 +148,10 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                 </div>
               ) : (
                 <>
-                  <p className="text-accent font-semibold text-sm">
+                  <p className="text-accent font-semibold text-base">
                     ₹{item.variations[0].price.toFixed(2)} - ₹{item.variations[item.variations.length - 1].price.toFixed(2)}
                   </p>
-                  <ul className="mt-1 space-y-0.5 text-xs text-cream-muted">
+                  <ul className="mt-2 space-y-1 text-sm text-cream-muted">
                     {item.variations.slice(0, 4).map((v) => (
                       <li key={v.id} className="flex items-center justify-between gap-2">
                         <span className="truncate">{v.name}</span>
@@ -166,7 +172,7 @@ const MenuItemCard = ({ item, index, isPizza = false }: MenuItemCardProps) => {
                 className="flex items-center gap-1 bg-[#004240] hover:bg-[#004240] text-[#B8936E] px-2 py-1 rounded transition-colors"
               >
                 <Plus className="w-3 h-3" />
-                <span className="text-xs font-semibold">₹{item.price.toFixed(2)}</span>
+                <span className="text-sm font-semibold">₹{item.price.toFixed(2)}</span>
               </button>
               {normalItemQuantity > 0 && (
                 <div className="flex items-center gap-1 bg-card/50 border border-border/50 rounded px-2 py-1">

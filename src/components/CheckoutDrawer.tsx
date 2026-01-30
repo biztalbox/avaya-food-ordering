@@ -35,13 +35,13 @@ const CheckoutDrawer = () => {
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const table = new URLSearchParams(window.location.search).get('table/Room');
+  const table = new URLSearchParams(window.location.search).get('q');
 
   console.log(table);
 
 
 
-  const grandTotal = totalPriceWithDiscount;
+  const grandTotal = totalPriceWithDiscount;  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -105,10 +105,9 @@ const CheckoutDrawer = () => {
         subtotal: totalPrice,
         tax: totalTax,
         discount: totalDiscount,
-        total: grandTotal
-
-
-
+        total: grandTotal,
+        table_no: table || '',
+        description: formData.remark || ''
       };
 
       // Submit order to API

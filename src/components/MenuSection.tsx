@@ -9,19 +9,29 @@ interface MenuSectionProps {
 }
 
 const MenuSection = ({ category }: MenuSectionProps) => {
-  const { searchQuery } = useCart();
+  const { searchQuery, filterType } = useCart();
   const scrollRef = useRef<HTMLDivElement>(null);
   const isLeft = category.layout === 'left';
   const isPizza = category.name.toLowerCase().includes('pizza');
   const isSalad = category.name.toLowerCase().includes('salad');
 
-  // Filter items based on search
-  const filteredItems = category.items.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter items based on search and veg/non-veg filter
+  const filteredItems = category.items.filter(item => {
+    const matchesSearch = item.name.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    if (filterType === 'all') {
+      return matchesSearch;
+    }
+    
+    // Filter by item_attributeid: 1 = veg, 2 or 24 = non-veg
+    const isVeg = item.isVeg; // This should be set based on item_attributeid in useMenuData
+    const matchesFilter = filterType === 'veg' ? isVeg : !isVeg;
+    
+    return matchesSearch && matchesFilter;
+  });
 
-  // If searching and no items match, don't show section
-  if (searchQuery && filteredItems.length === 0) {
+  // If searching or filtering and no items match, don't show section
+  if ((searchQuery || filterType !== 'all') && filteredItems.length === 0) {
     return null;
   }
 
@@ -47,10 +57,10 @@ const MenuSection = ({ category }: MenuSectionProps) => {
   };
 
   return (
-    <section id={category.id} className={`${getBgClass()} py-0`}>
+        <section id={category.id} className={`${getBgClass()} py-0`}>
       {/* Hero Block - hide when searching */}
       {!searchQuery && (
-        <div className={`relative min-h-[150px] md:min-h-[260px] flex items-center ${isPizza ? 'min-h-[70vh]' : ''}`}>
+        <div className={`relative min-h-[120px] md:min-h-[180px] flex items-center ${isPizza ? 'min-h-[50vh]' : ''}`}>
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
@@ -93,7 +103,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
       )}
 
       {/* Items Carousel */}
-      <div className="container mx-auto px-6 py-24 md:py-28">
+      <div className="container mx-auto px-6 py-8 md:py-12">
         <div className="relative group">
           {/* Left Arrow */}
           <button
@@ -119,7 +129,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
             {filteredItems.map((item, index) => (
               <div
                 key={item.id}
-                className={`flex-shrink-0 snap-start ${isPizza ? 'w-[280px] md:w-[320px]' : 'w-[260px] md:w-[300px]'
+                className={`flex-shrink-0 snap-start ${isPizza ? 'w-[300px] md:w-[340px]' : 'w-[280px] md:w-[320px]'
                   }`}
               >
                 <MenuItemCard

@@ -4,9 +4,11 @@ import FloatingCart from '@/components/FloatingCart';
 import CartDrawer from '@/components/CartDrawer';
 import CheckoutDrawer from '@/components/CheckoutDrawer';
 import Footer from '@/components/Footer';
+import TableRequired from '@/components/TableRequired';
 import { useMenuData } from '@/hooks/useMenuData';
 import { CartProvider, useCart } from '@/context/CartContext';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect, useState } from 'react';
 
 const MenuContent = () => {
   const { searchQuery } = useCart();
@@ -77,6 +79,20 @@ const MenuContent = () => {
 };
 
 const Index = () => {
+  const [tableNumber, setTableNumber] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check if table number is in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const table = urlParams.get('q');
+    setTableNumber(table);
+  }, []);
+
+  // Show TableRequired component if no table number
+  if (!tableNumber) {
+    return <TableRequired />;
+  }
+
   return (
     <CartProvider>
       <div className="min-h-screen bg-background">

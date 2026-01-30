@@ -20,6 +20,8 @@ interface CartContextType {
   setIsCheckoutOpen: (open: boolean) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  filterType: 'all' | 'veg' | 'non-veg';
+  setFilterType: (type: 'all' | 'veg' | 'non-veg') => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -29,6 +31,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
   
   const { data: menuData } = useMenuData();
   const taxes = menuData?.taxes || [];
@@ -152,7 +155,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isCheckoutOpen,
       setIsCheckoutOpen,
       searchQuery,
-      setSearchQuery
+      setSearchQuery,
+      filterType,
+      setFilterType
     }}>
       {children}
     </CartContext.Provider>
