@@ -229,9 +229,9 @@ const CheckoutDrawer = () => {
                 <X className="w-5 h-5" />
               </button>
             </div>
-            <strong className="bg-[#004240] rounded-xl py-4 px-10 !text-left border border-border/30 text-sm font-medium text-[#B8936E]">
-              Your Table / Room no. is = {table}
-            </strong>
+            <div className="py-4 px-10 flex gap-3 !text-left text-lg font-medium text-[#B8936E]">
+              Your Table / Room no. is {table}
+            </div>
 
             {/* Form */}
             <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">

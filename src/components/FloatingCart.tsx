@@ -17,9 +17,9 @@ const FloatingCart = () => {
         >
           <motion.button
             onClick={() => setIsCartOpen(true)}
-            whileHover={{ scale: 1.02 }}
+            whileHover={{ scale: 1.02, }}
             whileTap={{ scale: 0.98 }}
-            className="w-full md:w-auto flex items-center justify-between gap-6 bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-4 rounded-2xl shadow-gold transition-colors"
+            className="w-full md:w-auto flex items-center justify-between gap-6 bg-[#B8936E] text-light px-6 py-4 rounded-xl"
           >
             <div className="flex items-center gap-3">
               <div className="relative">

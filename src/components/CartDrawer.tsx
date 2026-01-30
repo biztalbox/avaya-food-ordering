@@ -20,22 +20,12 @@ const CartDrawer = () => {
 
   const grandTotal = totalPriceWithDiscount;
 
-  const getItemEmoji = (name: string) => {
-    if (name.includes('Espresso') || name.includes('Latte') || name.includes('Cappuccino') || name.includes('Mocha') || name.includes('Americano') || name.includes('Macchiato') || name.includes('Cold') || name.includes('Flat')) return '☕';
-    if (name.includes('Pancake')) return '🥞';
-    if (name.includes('Avocado')) return '🥑';
-    if (name.includes('Omelette') || name.includes('English')) return '🍳';
-    if (name.includes('Croissant')) return '🥐';
-    if (name.includes('Granola')) return '🥣';
-    if (name.includes('Margherita') || name.includes('Pepperoni') || name.includes('Formaggi') || name.includes('BBQ') || name.includes('Veggie') || name.includes('Truffle')) return '🍕';
-    if (name.includes('Caesar') || name.includes('Greek') || name.includes('Quinoa') || name.includes('Garden') || name.includes('Asian')) return '🥗';
-    return '🌯';
-  };
-
   const handleCheckout = () => {
     setIsCartOpen(false);
     setIsCheckoutOpen(true);
   };
+
+  const PLACEHOLDER_IMAGE = import.meta.env.VITE_BASE_URL + 'placeholder.jpg';
 
   return (
     <AnimatePresence>
@@ -100,8 +90,8 @@ const CartDrawer = () => {
                     >
                         <img
                           className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                          src={item.image && item.image.trim() !== '' ? item.image : '/sample_dish.jpg'}
-                          onError={(e) => { e.currentTarget.src = '/sample_dish.jpg'; }}
+                          src={item.image && item.image.trim() !== '' ? item.image : PLACEHOLDER_IMAGE}
+                          onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
                         />
                     
 
@@ -180,7 +170,7 @@ const CartDrawer = () => {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={handleCheckout}
-                  className="w-full bg-accent hover:bg-accent/90 text-accent-foreground font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                  className="w-full bg-accent text-light font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
                 >
                   Checkout Now
                   <motion.span
