@@ -70,7 +70,7 @@ const MenuContent = () => {
     : menuCategories;
 
   return (
-    <main className="pt-20">
+    <main className="">
       {sortedCategories.map((category) => (
         <MenuSection key={category.id} category={category} />
       ))}

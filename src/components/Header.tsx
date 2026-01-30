@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, X, Search, Leaf, Drumstick } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useCart } from '@/context/CartContext';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
   const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
   const { searchQuery, setSearchQuery, setFilterType: setCartFilterType } = useCart();
 
@@ -23,118 +22,89 @@ const Header = () => {
   }, [filterType, setCartFilterType]);
 
   return (
-    <motion.header
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-background border-b border-border/50 shadow-lg"
+    <section
+      className="sticky top-0 z-50 bg-background border-b border-border/40 w-full"
     >
-      <div className="container mx-auto px-6 py-3">
-        {/* Top row with logo, centered search bar and menu button */}
-        <div className="flex items-center justify-between">
+      <div className="container mx-auto px-6 py-5">
+
+        {/* TOP ROW: Logo + Search (same line) */}
+        <div className="flex flex-row flex-wrap md:flex-nowrap items-center space-x-2 md:space-x-6 md:gap-6 w-full justify-between">
+
+
           {/* Logo */}
-          <motion.div 
+          <motion.div
             className="flex-shrink-0"
             whileHover={{ scale: 1.02 }}
           >
-            <img 
-              src="https://avayacafe.com/wp-content/uploads/2025/11/logo-1.png.webp" 
+            <img
+              src="https://avayacafe.com/wp-content/uploads/2025/11/logo-1.png.webp"
               alt="Avaya Cafe & Bakery"
-              className="h-8 w-auto"
+              className="h-10 w-auto"
             />
           </motion.div>
 
-          {/* Search Bar - centered */}
-          <div className="flex-1 max-w-md mx-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+          {/* Search Bar */}
+          <div className="max-w-2xl md:w-full">
+
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
                 type="text"
                 placeholder="Search for food items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 bg-card/50 border-transparent focus:border-transparent focus:ring-0 text-cream placeholder:text-muted-foreground"
+                className="h-10 p-6 pl-10 bg-card/50 border border-accent/70 focus:ring-0"
               />
             </div>
           </div>
 
-          {/* Menu Button - right corner */}
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-card/50 hover:bg-card transition-colors flex-shrink-0"
-          >
-            {menuOpen ? (
-              <X className="w-5 h-5 text-cream" />
-            ) : (
-              <Menu className="w-5 h-5 text-cream" />
-            )}
-          </motion.button>
-        </div>
+          {/* FILTERS */}
+          <div className="flex justify-center flex-grow mt-4 md:mt-0 md:flex-none">
+            <div className="inline-flex items-center bg-card/50 rounded-full p-1 border border-border/30">
 
-        {/* Veg/Non-Veg Filter Toggle */}
-        <div className="flex items-center justify-center mt-3">
-          <div className="inline-flex items-center bg-card/50 rounded-full p-1 border border-border/30">
-            <button
-              onClick={() => setFilterType('all')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                filterType === 'all'
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-cream-muted hover:text-cream'
-              }`}
-            >
-              All Items
-            </button>
-            <button
-              onClick={() => setFilterType('veg')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                filterType === 'veg'
-                  ? 'bg-green-500 text-white'
-                  : 'text-cream-muted hover:text-green-400'
-              }`}
-            >
-              <Leaf className="w-4 h-4" />
-              Veg
-            </button>
-            <button
-              onClick={() => setFilterType('non-veg')}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                filterType === 'non-veg'
-                  ? 'bg-red-500 text-white'
-                  : 'text-cream-muted hover:text-red-400'
-              }`}
-            >
-              <Drumstick className="w-4 h-4" />
-              Non-Veg
-            </button>
+              <button
+                onClick={() => setFilterType('all')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${filterType === 'all'
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                  }`}
+              >
+                All
+              </button>
+
+              <button
+                onClick={() => setFilterType('veg')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-2 ${filterType === 'veg'
+                    ? 'bg-green-500 text-white'
+                    : 'text-muted-foreground hover:text-green-400'
+                  }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-green-500" />
+                Veg
+              </button>
+
+              <button
+                onClick={() => setFilterType('non-veg')}
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-2 ${filterType === 'non-veg'
+                    ? 'bg-red-500 text-white'
+                    : 'text-muted-foreground hover:text-red-400'
+                  }`}
+              >
+                <span className="w-2 h-2 rounded-full bg-red-500" />
+                Non-Veg
+              </button>
+
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Mobile Menu Dropdown */}
-      <motion.div
-        initial={false}
-        animate={{ 
-          height: menuOpen ? 'auto' : 0,
-          opacity: menuOpen ? 1 : 0
-        }}
-        className="overflow-hidden bg-card/95 backdrop-blur-md"
-      >
-        <nav className="container mx-auto px-6 py-4 flex flex-col gap-3">
-          {['Coffee', 'Breakfast', 'Pizza', 'Salads', 'Rolls'].map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              onClick={() => setMenuOpen(false)}
-              className="text-cream-muted hover:text-accent transition-colors py-2 border-b border-border/30 last:border-0"
-            >
-              {item}
-            </a>
-          ))}
-        </nav>
-      </motion.div>
-    </motion.header>
+        
+
+
+      </div>
+    </section>
   );
+
 };
 
 export default Header;
