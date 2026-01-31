@@ -12,7 +12,7 @@ const TableRequired = () => {
     
     setIsLoading(true);
     // Redirect with table number
-    window.location.href = `/?q=${tableNumber.trim()}`;
+    window.location.href = import.meta.env.VITE_BASE_URL+`/?q=${tableNumber.trim()}`;
   };
 
   return (

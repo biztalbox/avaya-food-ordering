@@ -93,13 +93,13 @@ const MenuSection = ({ category }: MenuSectionProps) => {
 
       {/* Search result header */}
       {searchQuery && (
-        <div className="container mx-auto px-6 pt-8">
+        <div className="container mx-auto px-0 pt-8">
           <h3 className="text-xl font-semibold text-light">{category.name}</h3>
         </div>
       )}
 
       {/* Items Carousel */}
-      <div className="container mx-auto px-6 pt-8 pb-24">
+      <div className="container mx-auto px-0 pt-8 pb-24">
         <div className="relative group">
           {/* Left Arrow */}
           <button
@@ -120,7 +120,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
           {/* Scrollable Container */}
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-scroll pb-2 -mx-2 px-2 custom-scrollbar"
+            className="flex gap-4 overflow-x-scroll pb-2 -mx-2 px-6 custom-scrollbar"
           >
             {filteredItems.map((item, index) => (
               <div
