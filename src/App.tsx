@@ -23,7 +23,8 @@ const App = () => {
         <BrowserRouter basename={basename}>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/sukhdevvihar" element={<SukhdeviVihar />} />
+            <Route path="/gp" element={<Index />} />
+            <Route path="/sv" element={<SukhdeviVihar />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

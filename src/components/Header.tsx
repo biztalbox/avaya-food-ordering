@@ -26,7 +26,7 @@ const Header = () => {
 
   return (
     <section
-      className="sticky top-0 z-50 bg-background border-b border-accent w-full"
+      className="fixed top-0 z-50 bg-background border-b border-accent w-full"
     >
       <div className="container mx-auto px-6 py-5">
 

@@ -60,7 +60,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
         <section id={category.id} className={`${getBgClass()}`}>
       {/* Hero Block - hide when searching */}
       {!searchQuery && (
-        <div className={`relative min-h-[120px] md:min-h-[180px] flex items-center`}>
+        <div className={`relative min-h-[160px] md:min-h-[200px] flex items-center`}>
           {/* Background Image */}
           <div className="absolute inset-0">
             <img
@@ -93,7 +93,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
 
       {/* Search result header */}
       {searchQuery && (
-        <div className="container mx-auto px-0 pt-8">
+        <div className="container mx-auto px-6 pt-8">
           <h3 className="text-xl font-semibold text-light">{category.name}</h3>
         </div>
       )}
@@ -104,7 +104,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
           {/* Left Arrow */}
           <button
             onClick={() => scroll('left')}
-            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 z-10 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full p-2 text-cream opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent hover:text-accent-foreground hidden md:flex"
+            className="absolute left-5 top-1/2 -translate-y-1/2 -translate-x-2 md:-translate-x-4 z-10 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full p-2 text-cream opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent hover:text-accent-foreground hidden md:flex"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
@@ -112,7 +112,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
           {/* Right Arrow */}
           <button
             onClick={() => scroll('right')}
-            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 z-10 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full p-2 text-cream opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent hover:text-accent-foreground hidden md:flex"
+            className="absolute right-5 top-1/2 -translate-y-1/2 translate-x-2 md:translate-x-4 z-10 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full p-2 text-cream opacity-0 group-hover:opacity-100 transition-opacity hover:bg-accent hover:text-accent-foreground hidden md:flex"
           >
             <ChevronRight className="w-5 h-5" />
           </button>

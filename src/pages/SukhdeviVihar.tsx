@@ -4,11 +4,11 @@ import FloatingCart from '@/components/FloatingCart';
 import CartDrawer from '@/components/CartDrawer';
 import CheckoutDrawer from '@/components/CheckoutDrawer';
 import Footer from '@/components/Footer';
-import SukhdeviViharTableRequired from '@/components/SukhdeviViharTableRequired';
 import { useMenuData } from '@/hooks/useMenuData';
 import { CartProvider, useCart } from '@/context/CartContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
+import TableRequired from '@/components/TableRequired';
 
 const SukhdeviViharMenuContent = () => {
   const { searchQuery } = useCart();
@@ -25,7 +25,7 @@ const SukhdeviViharMenuContent = () => {
 
   // Show SukhdeviViharTableRequired component if no table number
   if (!tableNumber) {
-    return <SukhdeviViharTableRequired />;
+    return <TableRequired />;
   }
 
   if (isLoading) {
@@ -83,7 +83,7 @@ const SukhdeviViharMenuContent = () => {
     : menuCategories;
 
   return (
-    <main className="pt-20">
+    <main className="pt-20 min-h-screen">
       {sortedCategories.map((category) => (
         <MenuSection key={category.id} category={category} />
       ))}
@@ -103,12 +103,12 @@ const SukhdeviVihar = () => {
 
   // Show SukhdeviViharTableRequired component if no table number
   if (!tableNumber) {
-    return <SukhdeviViharTableRequired />;
+    return <TableRequired />;
   }
 
   return (
     <CartProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background overflow-hidden">
         <Header />
         <SukhdeviViharMenuContent />
         <Footer />
