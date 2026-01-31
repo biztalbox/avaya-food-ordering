@@ -108,7 +108,7 @@ const SukhdeviVihar = () => {
 
   return (
     <CartProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background pt-36 md:pt-20">
         <Header />
         <SukhdeviViharMenuContent />
         <Footer />
