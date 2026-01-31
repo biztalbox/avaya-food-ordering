@@ -136,36 +136,29 @@ const CheckoutDrawer = () => {
   };
 
   const validateForm = (): boolean => {
-    const newErrors = {
-      name: '',
-      phone: ''
-    };
+    const newErrors = { name: '', phone: '' };
 
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Name must be at least 2 characters';
-    } else if (!/^[a-zA-Z\s\.'-]+$/.test(formData.name)) {
+    // Name validation (optional)
+    if (formData.name.trim() && !/^[a-zA-Z\s\.'-]+$/.test(formData.name.trim())) {
       newErrors.name = 'Name can only contain letters, spaces, dots, hyphens and apostrophes';
     }
 
-    // Phone validation
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone number is required';
-    } else if (!/^[0-9]+$/.test(formData.phone)) {
-      newErrors.phone = 'Phone number can only contain digits';
-    } else if (formData.phone.length < 10) {
-      newErrors.phone = 'Phone number must be at least 10 digits';
-    } else if (formData.phone.length > 15) {
-      newErrors.phone = 'Phone number cannot exceed 15 digits';
+    // Phone validation (optional)
+    if (formData.phone.trim()) {
+      if (!/^[0-9]+$/.test(formData.phone)) {
+        newErrors.phone = 'Phone number can only contain digits';
+      } else if (formData.phone.length < 10) {
+        newErrors.phone = 'Phone number must be at least 10 digits';
+      } else if (formData.phone.length > 15) {
+        newErrors.phone = 'Phone number cannot exceed 15 digits';
+      }
     }
 
     setErrors(newErrors);
     return !newErrors.name && !newErrors.phone;
   };
 
-  const isFormValid = formData.name.trim() && formData.phone.trim() && !errors.name && !errors.phone;
+  const isFormValid = !errors.name && !errors.phone;
 
   return (
     <AnimatePresence>
@@ -317,8 +310,8 @@ const CheckoutDrawer = () => {
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      placeholder="Your Name *"
-                      required
+                      placeholder="Your Name "
+                      
                       className={`w-full bg-muted/50 border rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all ${errors.name
                           ? 'border-red-500 focus:border-red-500'
                           : 'border-border/50 focus:border-accent/50'
@@ -337,8 +330,8 @@ const CheckoutDrawer = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="Phone Number *"
-                      required
+                      placeholder="Phone Number "
+                     
                       maxLength={15}
                       className={`w-full bg-muted/50 border rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all ${errors.phone
                           ? 'border-red-500 focus:border-red-500'
@@ -357,7 +350,7 @@ const CheckoutDrawer = () => {
                       name="remark"
                       value={formData.remark}
                       onChange={handleChange}
-                      placeholder="Special instructions or remarks (optional)"
+                      placeholder="Special instructions or remarks"
                       rows={3}
                       className="w-full bg-muted/50 border border-border/50 rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all resize-none"
                     />

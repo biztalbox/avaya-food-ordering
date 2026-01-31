@@ -109,9 +109,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const discountAmount = parseFloat(discount.discount);
     const minAmount = parseFloat(discount.discountminamount);
     const maxAmount = parseFloat(discount.discountmaxamount);
+    const ignoreDiscount = parseInt(discount.ignore_discount || '0');
     
     // Check if order meets minimum amount requirement
     if (totalPrice < minAmount) return sum;
+    
+    // Check if discount should be ignored (ignore_discount: 0 means apply discount)
+    if (ignoreDiscount !== 0) return sum;
     
     let calculatedDiscount = 0;
     
@@ -129,9 +133,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return sum + calculatedDiscount;
   }, 0);
 
-  // Temporary 20% discount for all items (will be replaced by API discounts when available)
-  const tempDiscount = discounts.length === 0 ? (totalPrice * 0.20) : 0;
-  const finalTotalDiscount = totalDiscount + tempDiscount;
+  // No temporary discount - only use API discounts
+  const finalTotalDiscount = totalDiscount;
   
   const totalPriceWithDiscount = totalPriceWithTax - finalTotalDiscount;
 
