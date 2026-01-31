@@ -78,6 +78,7 @@ export interface APIDiscount {
   active: string;
   discountmaxlimit: string;
   rank: string;
+  ignore_discount?: string;  // 0 = apply discount, 1 = ignore discount
 }
 
 export interface APIMenuResponse {
