@@ -181,6 +181,7 @@ const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: API
             : getDummyImage(item.itemname, item.itemid, category.categoryname),
           // item_attributeid: 1 = Veg, 2 = Non-Veg
           isVeg: item.item_attributeid === '1',
+          ignore_taxes: item.ignore_taxes,
         };
         
         // Add variations if available
@@ -213,7 +214,7 @@ const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: API
   
   if (restaurantDetails) {
     const restaurantData: RestaurantData = {
-      restID: apiData.restaurant_id || restaurantDetails.restaurantid || 'xxxxxx',
+      restID: "vgmk01irnu", // apiData.restaurant_id || restaurantDetails.restaurantid || 'xxxxxx',
       res_name: restaurantDetails.restaurantname || 'Unknown Restaurant',
       address: restaurantDetails.address || 'Address not available',
       contact_information: restaurantDetails.contact || 'Contact not available'
