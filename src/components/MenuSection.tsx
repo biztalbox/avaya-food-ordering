@@ -125,7 +125,7 @@ const MenuSection = ({ category }: MenuSectionProps) => {
             {filteredItems.map((item, index) => (
               <div
                 key={item.id}
-                className="flex-shrink-0 snap-start w-[280px] md:w-[320px]"
+                className="flex-shrink-0 snap-start"
               >
                 <MenuItemCard
                   item={item}

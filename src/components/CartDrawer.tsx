@@ -62,7 +62,7 @@ const CartDrawer = () => {
                 )}
               </div>
               <button
-                onClick={() => setIsCartOpen(false)}
+                onClick={() => {setIsCartOpen(false); document.body.style.overflow = 'auto';}}
                 className="p-2 rounded-full hover:bg-muted transition-colors text-cream-muted hover:text-cream"
               >
                 <X className="w-5 h-5" />

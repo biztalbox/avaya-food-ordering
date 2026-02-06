@@ -222,7 +222,7 @@ const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: API
     
     // Store restaurant data in localStorage
     localStorage.setItem('restaurantData', JSON.stringify(restaurantData));
-    console.log('Restaurant data stored in localStorage:', restaurantData);
+    
   }
   
   return {
@@ -251,7 +251,7 @@ export const useRestaurantData = (): RestaurantData | null => {
     }
     return null;
   } catch (error) {
-    console.error('Error reading restaurant data from localStorage:', error);
+    
     return null;
   }
 };

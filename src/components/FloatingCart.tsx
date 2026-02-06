@@ -16,7 +16,7 @@ const FloatingCart = () => {
           className="fixed bottom-6 right-6 left-6 md:left-auto md:right-8 md:bottom-8 z-40"
         >
           <motion.button
-            onClick={() => setIsCartOpen(true)}
+            onClick={() => {setIsCartOpen(true); document.body.style.overflow = 'hidden';}}
             whileHover={{ scale: 1.02, }}
             whileTap={{ scale: 0.98 }}
             className="w-full md:w-auto flex items-center justify-between gap-6 bg-[#B8936E] text-light px-6 py-4 rounded-xl"

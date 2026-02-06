@@ -37,7 +37,7 @@ const CheckoutDrawer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const table = new URLSearchParams(window.location.search).get('q');
 
-  console.log(table);
+  
 
 
 
@@ -113,7 +113,7 @@ const CheckoutDrawer = () => {
       // Submit order to API
       const response = await saveOrder(orderData, taxes);
 
-      console.log('Order submitted successfully:', response);
+      
 
       // Show success state
       setIsSubmitted(true);
@@ -123,11 +123,12 @@ const CheckoutDrawer = () => {
         clearCart();
         setIsSubmitted(false);
         setIsCheckoutOpen(false);
+        document.body.style.overflow = 'auto';
         setFormData({ name: '', phone: '', remark: '' });
       }, 3000);
 
     } catch (error) {
-      console.error('Error submitting order:', error);
+      
       // Handle error (you could show an error message here)
       alert('Failed to place order. Please try again.');
     } finally {
@@ -216,7 +217,7 @@ const CheckoutDrawer = () => {
               <h2 className="text-xl font-semibold text-cream">Checkout</h2>
 
               <button
-                onClick={() => setIsCheckoutOpen(false)}
+                onClick={() => {setIsCheckoutOpen(false); document.body.style.overflow = 'auto';}}
                 className="p-2 rounded-full hover:bg-muted transition-colors text-cream-muted hover:text-cream ml-auto"
               >
                 <X className="w-5 h-5" />
@@ -258,7 +259,7 @@ const CheckoutDrawer = () => {
                 {/* Order Summary */}
                 <div className="bg-[#004240] rounded-xl p-4 border border-border/30">
                   <h3 className="text-sm font-medium text-cream mb-3">Order Summary</h3>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                  <div className="space-y-2">
                     {items.map(item => (
                       <div key={item.id} className="flex justify-between text-sm">
                         <span className="text-cream">
@@ -285,7 +286,8 @@ const CheckoutDrawer = () => {
                         </div>
                       );
                     })}
-                    {totalDiscount > 0 && (
+                    {/* Only show discount section if there's an actual discount greater than 0 */}
+                    {totalDiscount && totalDiscount > 0 && (
                       <div className="flex justify-between text-sm">
                         <span className="text-cream-muted">Discount {`(${((totalDiscount / (totalPrice + totalTax)) * 100).toFixed(0)}%)`}</span>
                         <span className="text-green-500">-₹{totalDiscount.toFixed(2)}</span>

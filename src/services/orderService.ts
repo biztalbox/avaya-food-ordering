@@ -228,12 +228,12 @@ export const fetchRestaurantData = async (): Promise<RestaurantData> => {
     
     if (storedData) {
       const restaurantData = JSON.parse(storedData) as RestaurantData;
-      console.log('Restaurant data retrieved from localStorage:', restaurantData);
+      
       return restaurantData;
     }
     
     // If no data in localStorage, fetch from API (fallback)
-    console.log('No restaurant data in localStorage, fetching from API...');
+    
     const response = await fetch(API_CONFIG.fetchMenuEndpoint);
     if (!response.ok) {
       throw new Error(`Failed to fetch restaurant data: ${response.status}`);
@@ -256,11 +256,11 @@ export const fetchRestaurantData = async (): Promise<RestaurantData> => {
     
     // Store in localStorage for future use
     localStorage.setItem('restaurantData', JSON.stringify(restaurant));
-    console.log('Restaurant data fetched and stored:', restaurant);
+    
     return restaurant;
     
   } catch (error) {
-    console.error('Error getting restaurant data:', error);
+    
     // Return default restaurant data on error
     return {
       restID: 'xxxxxx',
@@ -403,9 +403,7 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
 export const saveOrder = async (orderData: OrderData, taxes: any[] = []): Promise<any> => {
   try {
     const transformedData = await transformOrderData(orderData, taxes);
-    console.log('Original order data:', orderData);
-    console.log('Transformed order data:', JSON.stringify(transformedData, null, 2));
-    console.log('API Endpoint:', API_CONFIG.saveOrderEndpoint);
+    
     
     const response = await fetch(API_CONFIG.saveOrderEndpoint, {
       method: 'POST',
@@ -415,20 +413,19 @@ export const saveOrder = async (orderData: OrderData, taxes: any[] = []): Promis
       body: JSON.stringify(transformedData)
     });
 
-    console.log('API Response status:', response.status);
-    console.log('API Response headers:', response.headers);
+    
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API Error:', errorText);
+      
       throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
 
     const result = await response.json();
-    console.log('API Success Response:', result);
+    
     return result;
   } catch (error) {
-    console.error('Error saving order:', error);
+    
     throw error;
   }
 };
