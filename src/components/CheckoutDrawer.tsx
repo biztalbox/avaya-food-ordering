@@ -37,7 +37,7 @@ const CheckoutDrawer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const table = new URLSearchParams(window.location.search).get('q');
 
-  console.log(table);
+  
 
 
 
@@ -113,7 +113,7 @@ const CheckoutDrawer = () => {
       // Submit order to API
       const response = await saveOrder(orderData, taxes);
 
-      console.log('Order submitted successfully:', response);
+      
 
       // Show success state
       setIsSubmitted(true);
@@ -128,7 +128,7 @@ const CheckoutDrawer = () => {
       }, 3000);
 
     } catch (error) {
-      console.error('Error submitting order:', error);
+      
       // Handle error (you could show an error message here)
       alert('Failed to place order. Please try again.');
     } finally {
