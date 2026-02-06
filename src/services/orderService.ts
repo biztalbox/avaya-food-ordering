@@ -1,12 +1,20 @@
 // API Configuration
 const API_CONFIG = {
-  baseUrl: 'https://qle1yy2ydc.execute-api.ap-southeast-1.amazonaws.com/V1',
-  saveOrderEndpoint: 'https://qle1yy2ydc.execute-api.ap-southeast-1.amazonaws.com/V1/save_order',
-  fetchMenuEndpoint: 'https://avayacafe.com/online-order/api/fetchMenu.php',
-  accessToken: '1cce78e98ea6739f92e2673b190747fda7b6f211',
-  appKey: '7b04w6os3njqkvtrmycix52f9zgu8a1p',
-  appSecret: '94eab54924201de23132672a68c16d375a0c57cd'
+  saveOrderEndpoint: import.meta.env.VITE_API_BASE_URL,
+  fetchMenuEndpoint: import.meta.env.VITE_MENU_API_URL,
+  accessToken: import.meta.env.VITE_ACCESS_TOKEN,
+  appKey: import.meta.env.VITE_APP_KEY,
+  appSecret: import.meta.env.VITE_APP_SECRET,
 };
+
+// Debug: Log environment variables
+console.log('Environment Variables:', {
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  VITE_MENU_API_URL: import.meta.env.VITE_MENU_API_URL,
+  VITE_ACCESS_TOKEN: import.meta.env.VITE_ACCESS_TOKEN,
+  VITE_APP_KEY: import.meta.env.VITE_APP_KEY,
+  VITE_APP_SECRET: import.meta.env.VITE_APP_SECRET,
+});
 
 // Hardcoded defaults for save_order API (dine-in / table order)
 const ORDER_DEFAULTS = {
@@ -403,8 +411,8 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
 export const saveOrder = async (orderData: OrderData, taxes: any[] = []): Promise<any> => {
   try {
     const transformedData = await transformOrderData(orderData, taxes);
-    
-    
+    console.log('Request Payload:', JSON.stringify(transformedData, null, 2));
+
     const response = await fetch(API_CONFIG.saveOrderEndpoint, {
       method: 'POST',
       headers: {
@@ -413,16 +421,15 @@ export const saveOrder = async (orderData: OrderData, taxes: any[] = []): Promis
       body: JSON.stringify(transformedData)
     });
 
-    
-
+    console.log('API Response Status:', response.status);
     if (!response.ok) {
       const errorText = await response.text();
-      
+      console.error('API Error Response:', errorText);
       throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
 
     const result = await response.json();
-    
+    console.log('API Success Response:', result);
     return result;
   } catch (error) {
     
