@@ -116,7 +116,7 @@ const SukhdeviVihar = () => {
         <CartDrawer />
         <CheckoutDrawer />
       </div>
-    </CartProvider>
+    </CartProvider >
   );
 };
 

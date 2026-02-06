@@ -101,8 +101,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const totalPriceWithTax = totalPrice + totalTax;
   
-  // Calculate discounts
-  const totalDiscount = discounts.reduce((sum, discount) => {
+  // Calculate discounts - only apply if there are active discounts
+  const totalDiscount = discounts.length > 0 ? discounts.reduce((sum, discount) => {
     if (discount.active !== 'true') return sum;
     
     const discountType = parseInt(discount.discounttype);
@@ -131,7 +131,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     
     return sum + calculatedDiscount;
-  }, 0);
+  }, 0) : 0;
 
   // No temporary discount - only use API discounts
   const finalTotalDiscount = totalDiscount;

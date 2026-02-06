@@ -135,22 +135,49 @@ const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
                   })}
                 </div>
               ) : (
-                <>
-                  <p className="text-accent font-semibold text-base">
-                    ₹{item.variations[0].price.toFixed(2)} - ₹{item.variations[item.variations.length - 1].price.toFixed(2)}
-                  </p>
-                  <ul className="mt-2 space-y-1 text-sm text-cream-muted">
-                    {item.variations.slice(0, 4).map((v) => (
-                      <li key={v.id} className="flex items-center justify-between gap-2">
-                        <span className="truncate">{v.name}</span>
-                        <span className="text-cream">₹{v.price.toFixed(2)}</span>
-                      </li>
-                    ))}
-                    {item.variations.length > 4 ? (
-                      <li className="text-cream-muted">+{item.variations.length - 4} more</li>
-                    ) : null}
-                  </ul>
-                </>
+                <div className="flex flex-col gap-1">
+                  {item.variations.map((variation) => {
+                    const variationQuantity = getVariationQuantity(variation.id);
+                    return (
+                      <div key={variation.id} className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-cream-muted truncate">
+                          {variation.name}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-accent font-semibold">₹{variation.price.toFixed(2)}</span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => removeItem(item.id, variation.id)}
+                              className="w-6 h-6 rounded-full bg-black/30 flex items-center justify-center text-white"
+                            >
+                              <span className="text-base -mt-1 leading-none">−</span>
+                            </button>
+                            <span className="text-xs font-medium text-cream min-w-[12px] text-center">
+                              {variationQuantity}
+                            </span>
+                            <button
+                              onClick={() => {
+                                const itemWithVariation = {
+                                  ...item,
+                                  price: variation.price,
+                                  selectedVariation: {
+                                    id: variation.id,
+                                    name: variation.name,
+                                    price: variation.price
+                                  }
+                                };
+                                addItem(itemWithVariation);
+                              }}
+                              className="w-6 h-6 rounded-full bg-black/30 flex items-center justify-center text-white"
+                            >
+                              <span className="text-base -mt-1 leading-none">+</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               )}
             </div>
           ) : (
