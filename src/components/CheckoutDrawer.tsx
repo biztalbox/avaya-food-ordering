@@ -85,8 +85,8 @@ const CheckoutDrawer = () => {
         item_id: item.id,
         item_name: item.name,
         quantity: item.quantity,
-
         price: item.price,
+        ...(item.ignore_taxes !== undefined && { ignore_taxes: item.ignore_taxes }),
         ...(item.selectedVariation && {
           variation: {
             id: item.selectedVariation.id,

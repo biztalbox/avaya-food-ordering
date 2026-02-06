@@ -21,6 +21,7 @@ export interface APIItem {
   variation: APIVariation[];
   active: string;
   in_stock: string;
+  ignore_taxes?: string;  // "0" = tax inclusive, else not
 }
 
 export interface APICategory {
@@ -120,6 +121,7 @@ export interface MenuItem {
   image?: string;
   description?: string;
   isVeg?: boolean;
+  ignore_taxes?: string;  // "0" = tax inclusive, else not
   variations?: {
     id: string;
     name: string;

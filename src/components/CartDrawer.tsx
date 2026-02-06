@@ -88,12 +88,12 @@ const CartDrawer = () => {
                       exit={{ opacity: 0, x: 50 }}
                       className="flex gap-4  rounded-md border-[#B8936E] p-4 border border-border/30"
                     >
-                        <img
-                          className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                          src={item.image && item.image.trim() !== '' ? item.image : PLACEHOLDER_IMAGE}
-                          onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
-                        />
-                    
+                      <img
+                        className="w-16 h-16 rounded-full object-cover flex-shrink-0"
+                        src={item.image && item.image.trim() !== '' ? item.image : PLACEHOLDER_IMAGE}
+                        onError={(e) => { e.currentTarget.src = PLACEHOLDER_IMAGE; }}
+                      />
+
 
                       {/* Details */}
                       <div className="flex-1 min-w-0">
@@ -151,10 +151,12 @@ const CartDrawer = () => {
                     <span>Subtotal</span>
                     <span>₹{totalPrice.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-cream-muted">
-                    <span>Discount {totalDiscount > 0 && `(${((totalDiscount / (totalPrice + totalTax)) * 100).toFixed(0)}%)`}</span>
-                    <span className="text-green-500">-₹{totalDiscount.toFixed(2)}</span>
-                  </div>
+                  {totalDiscount > 0 && (
+                    <div className="flex justify-between text-cream-muted">
+                      <span>Discount {`(${((totalDiscount / (totalPrice + totalTax)) * 100).toFixed(0)}%)`}</span>
+                      <span className="text-green-500">-₹{totalDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-cream-muted">
                     <span>Taxes (CGST + SGST)</span>
                     <span>₹{totalTax.toFixed(2)}</span>
