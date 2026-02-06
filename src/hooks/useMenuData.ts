@@ -214,7 +214,7 @@ const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: API
   
   if (restaurantDetails) {
     const restaurantData: RestaurantData = {
-      restID: "vgmk01irnu", // apiData.restaurant_id || restaurantDetails.restaurantid || 'xxxxxx',
+      restID: restaurantDetails.menusharingcode || "N/A",
       res_name: restaurantDetails.restaurantname || 'Unknown Restaurant',
       address: restaurantDetails.address || 'Address not available',
       contact_information: restaurantDetails.contact || 'Contact not available'
