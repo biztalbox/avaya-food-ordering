@@ -65,6 +65,7 @@ export interface OrderData {
   customer_address?: string;
   latitude?: string;
   longitude?: string;
+  couponCode?: string;
 }
 
 // Restaurant interface (keeping for backward compatibility)
@@ -93,6 +94,7 @@ export interface CustomerDetails {
   phone: string;
   latitude: string;
   longitude: string;
+
 }
 
 // Order details for API (full structure)
@@ -233,42 +235,42 @@ export const fetchRestaurantData = async (): Promise<RestaurantData> => {
   try {
     // Try to get restaurant data from localStorage first
     const storedData = localStorage.getItem('restaurantData');
-    
+
     if (storedData) {
       const restaurantData = JSON.parse(storedData) as RestaurantData;
-      
+
       return restaurantData;
     }
-    
+
     // If no data in localStorage, fetch from API (fallback)
-    
+
     const response = await fetch(API_CONFIG.fetchMenuEndpoint);
     if (!response.ok) {
       throw new Error(`Failed to fetch restaurant data: ${response.status}`);
     }
     const data = await response.json();
-    
+
     // Extract restaurant details from API response
     const restaurantDetails = data.menu?.restaurants?.[0]?.details;
-    
+
     if (!restaurantDetails) {
       throw new Error('Restaurant details not found in API response');
     }
-    
+
     const restaurant: RestaurantData = {
       restID: data.restaurant_id || restaurantDetails.restaurantid,
       res_name: restaurantDetails.restaurantname,
       address: restaurantDetails.address,
       contact_information: restaurantDetails.contact
     };
-    
+
     // Store in localStorage for future use
     localStorage.setItem('restaurantData', JSON.stringify(restaurant));
-    
+
     return restaurant;
-    
+
   } catch (error) {
-    
+
     // Return default restaurant data on error
     return {
       restID: 'xxxxxx',
@@ -290,7 +292,7 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
   const preorderTime = now.toTimeString().slice(0, 8);   // HH:mm:ss
   const createdOn = `${preorderDate} ${preorderTime}`;  // YYYY-MM-DD HH:mm:ss
   const orderID = generateOrderId();
-  
+
   // Transform order items (with AddonItem; addons empty for now)
   const orderItemDetails: OrderItemDetailWithAddon[] = orderData.items.map(item => {
     const itemTaxDetails = taxes.map(tax => ({
@@ -331,10 +333,38 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
     restaurant_liable_amt: '0.00'
   }));
 
-  // Discount details (one entry when discount > 0)
-  const discountDetails: DiscountDetail[] = orderData.discount > 0
-    ? [{ id: '0', title: 'Discount', type: ORDER_DEFAULTS.discount_type, price: orderData.discount.toFixed(2) }]
-    : [];
+  // Discount details (one entry when discount > 0 or coupon applied)
+  let discountDetails: DiscountDetail[] = [];
+
+  if (orderData.discount > 0 || (orderData.couponCode && orderData.couponCode.trim() !== '')) {
+    let discountId = '0';
+    let discountType = ORDER_DEFAULTS.discount_type;
+    let discountTitle = 'Discount';
+
+    if (orderData.couponCode) {
+      const code = orderData.couponCode.toLowerCase().trim();
+      if (code === 'percentage testing') {
+        discountId = '288566';
+        discountType = '1';
+        discountTitle = 'percentage testing';
+      } else if (code === 'fixed testing') {
+        discountId = '288567';
+        discountType = '2';
+        discountTitle = 'fixed testing';
+      } else if (code === 'bogo testing') {
+        discountId = '28885678';
+        discountType = '3';
+        discountTitle = 'bogo testing';
+      }
+    }
+
+    discountDetails = [{
+      id: discountId,
+      title: discountTitle,
+      type: discountType,
+      price: orderData.total.toFixed(2)
+    }];
+  }
 
   // Order details (full API shape)
   const orderDetails: OrderDetailsApi = {
@@ -432,7 +462,7 @@ export const saveOrder = async (orderData: OrderData, taxes: any[] = []): Promis
     console.log('API Success Response:', result);
     return result;
   } catch (error) {
-    
+
     throw error;
   }
 };

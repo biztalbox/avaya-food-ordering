@@ -9,6 +9,31 @@ const Header = () => {
   const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
   const { searchQuery, setSearchQuery, setFilterType: setCartFilterType } = useCart();
 
+  // Function to scroll to menu section
+  const scrollToMenu = () => {
+    setTimeout(() => {
+      // Try multiple selectors to find menu sections
+      let menuSection = document.querySelector('section[id^="category-"]');
+      
+      // If not found, try other common selectors
+      if (!menuSection) {
+        menuSection = document.querySelector('[class*="menu-section"]') || 
+                       document.querySelector('[class*="category"]') ||
+                       document.querySelector('main') ||
+                       document.querySelector('.container');
+      }
+      
+      // As a last resort, scroll to top of page
+      if (!menuSection) {
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+        return;
+      }
+      
+      console.log('Found menu section for scroll:', menuSection);
+      menuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 100);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -68,7 +93,10 @@ const Header = () => {
             <div className="inline-flex items-center bg-card/50 rounded-full p-1 border border-border/30">
 
               <button
-                onClick={() => setFilterType('all')}
+                onClick={() => {
+                  setFilterType('all');
+                  scrollToMenu();
+                }}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${filterType === 'all'
                   ? 'bg-secondary text-accent'
                   : 'text-muted-foreground hover:text-foreground'
@@ -78,7 +106,10 @@ const Header = () => {
               </button>
 
               <button
-                onClick={() => setFilterType('veg')}
+                onClick={() => {
+                  setFilterType('veg');
+                  scrollToMenu();
+                }}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-2 ${filterType === 'veg'
                   ? 'bg-secondary text-white'
                   : 'text-muted-foreground hover:text-green-400'
@@ -89,7 +120,10 @@ const Header = () => {
               </button>
 
               <button
-                onClick={() => setFilterType('non-veg')}
+                onClick={() => {
+                  setFilterType('non-veg');
+                  scrollToMenu();
+                }}
                 className={`px-4 py-1.5 rounded-full text-sm font-medium transition flex items-center gap-2 ${filterType === 'non-veg'
                   ? 'bg-secondary text-white'
                   : 'text-muted-foreground hover:text-red-400'

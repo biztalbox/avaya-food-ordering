@@ -22,6 +22,9 @@ interface CartContextType {
   setSearchQuery: (query: string) => void;
   filterType: 'all' | 'veg' | 'non-veg';
   setFilterType: (type: 'all' | 'veg' | 'non-veg') => void;
+  couponCode: string;
+  couponDiscount: number;
+  setCoupon: (code: string, discount: number) => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -32,7 +35,13 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
-  
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+
+  const setCoupon = useCallback((code: string, discount: number) => {
+    setCouponCode(code);
+    setCouponDiscount(discount);
+  }, []);
   const { data: menuData } = useMenuData();
   const taxes = menuData?.taxes || [];
   const discounts = menuData?.discounts || [];
@@ -40,103 +49,126 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const addItem = useCallback((item: MenuItem) => {
     setItems(prev => {
       // Create a unique ID for items with variations
-      const uniqueId = item.selectedVariation 
+      const uniqueId = item.selectedVariation
         ? `${item.id}-${item.selectedVariation.id}`
         : item.id;
-      
-      const existing = prev.find(i => 
-        i.id === item.id && 
+
+      const existing = prev.find(i =>
+        i.id === item.id &&
         (!item.selectedVariation || i.selectedVariation?.id === item.selectedVariation.id)
       );
-      
+
       if (existing) {
-        return prev.map(i => 
-          (i.id === item.id && 
-           (!item.selectedVariation || i.selectedVariation?.id === item.selectedVariation.id))
-            ? { ...i, quantity: i.quantity + 1 } 
+        return prev.map(i =>
+          (i.id === item.id &&
+            (!item.selectedVariation || i.selectedVariation?.id === item.selectedVariation.id))
+            ? { ...i, quantity: i.quantity + 1 }
             : i
         );
       }
       return [...prev, { ...item, quantity: 1 }];
     });
+
+    // Scroll to menu section after adding item
+    setTimeout(() => {
+      // Try multiple selectors to find menu sections
+      let menuSection = document.querySelector('section[id^="category-"]');
+
+      // If not found, try other common selectors
+      if (!menuSection) {
+        menuSection = document.querySelector('[class*="menu-section"]') ||
+          document.querySelector('[class*="category"]') ||
+          document.querySelector('main') ||
+          document.querySelector('.container');
+      }
+
+      // As a last resort, scroll to top of page
+      if (!menuSection) {
+        window.scrollTo({ top: 200, behavior: 'smooth' });
+        return;
+      }
+
+      console.log('Found menu section:', menuSection);
+      menuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 200);
   }, []);
 
   const removeItem = useCallback((itemId: string, variationId?: string) => {
     setItems(prev => {
-      const existing = prev.find(i => 
-        i.id === itemId && 
+      const existing = prev.find(i =>
+        i.id === itemId &&
         (!variationId || i.selectedVariation?.id === variationId)
       );
-      
+
       if (existing && existing.quantity > 1) {
         return prev.map(i =>
-          (i.id === itemId && 
-           (!variationId || i.selectedVariation?.id === variationId))
-            ? { ...i, quantity: i.quantity - 1 } 
+          (i.id === itemId &&
+            (!variationId || i.selectedVariation?.id === variationId))
+            ? { ...i, quantity: i.quantity - 1 }
             : i
         );
       }
-      return prev.filter(i => 
-        !(i.id === itemId && 
+      return prev.filter(i =>
+        !(i.id === itemId &&
           (!variationId || i.selectedVariation?.id === variationId))
       );
     });
   }, []);
 
   const getItemQuantity = useCallback((itemId: string, variationId?: string) => {
-    return items.find(i => 
-      i.id === itemId && 
+    return items.find(i =>
+      i.id === itemId &&
       (!variationId || i.selectedVariation?.id === variationId)
     )?.quantity || 0;
   }, [items]);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  
+
   // Calculate taxes
-  const totalTax = taxes.reduce((sum, tax) => {
+  const totalTax = taxes.filter(tax => tax && tax.tax && parseFloat(tax.tax) > 0).reduce((sum, tax) => {
     const taxRate = parseFloat(tax.tax) / 100;
     return sum + (totalPrice * taxRate);
   }, 0);
-  
+
   const totalPriceWithTax = totalPrice + totalTax;
-  
+
   // Calculate discounts - only apply if there are active discounts
   const totalDiscount = discounts.length > 0 ? discounts.reduce((sum, discount) => {
     if (discount.active !== 'true') return sum;
-    
+
     const discountType = parseInt(discount.discounttype);
     const discountAmount = parseFloat(discount.discount);
     const minAmount = parseFloat(discount.discountminamount);
     const maxAmount = parseFloat(discount.discountmaxamount);
     const ignoreDiscount = parseInt(discount.ignore_discount || '0');
-    
+
     // Check if order meets minimum amount requirement
     if (totalPrice < minAmount) return sum;
-    
+
     // Check if discount should be ignored (ignore_discount: 0 means apply discount)
     if (ignoreDiscount !== 0) return sum;
-    
+
     let calculatedDiscount = 0;
-    
+
     if (discountType === 1) { // Percentage discount
       calculatedDiscount = (totalPrice * discountAmount) / 100;
     } else if (discountType === 2) { // Fixed discount
       calculatedDiscount = discountAmount;
     }
-    
+
     // Apply maximum discount limit if specified
     if (maxAmount > 0 && calculatedDiscount > maxAmount) {
       calculatedDiscount = maxAmount;
     }
-    
+
     return sum + calculatedDiscount;
   }, 0) : 0;
 
   // No temporary discount - only use API discounts
   const finalTotalDiscount = totalDiscount;
-  
-  const totalPriceWithDiscount = totalPriceWithTax - finalTotalDiscount;
+
+  const totalPriceWithDiscount = totalPriceWithTax - finalTotalDiscount - couponDiscount;
 
   const clearCart = useCallback(() => setItems([]), []);
 
@@ -160,7 +192,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       searchQuery,
       setSearchQuery,
       filterType,
-      setFilterType
+      setFilterType,
+      couponCode,
+      couponDiscount,
+      setCoupon
     }}>
       {children}
     </CartContext.Provider>

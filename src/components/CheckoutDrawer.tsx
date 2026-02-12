@@ -16,7 +16,9 @@ const CheckoutDrawer = () => {
     totalPriceWithTax,
     totalDiscount,
     totalPriceWithDiscount,
-    clearCart
+    clearCart,
+    couponDiscount,
+    couponCode
   } = useCart();
 
   const { data: menuData } = useMenuData();
@@ -37,11 +39,11 @@ const CheckoutDrawer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const table = new URLSearchParams(window.location.search).get('q');
 
-  
 
 
 
-  const grandTotal = totalPriceWithDiscount;  
+
+  const grandTotal = totalPriceWithDiscount;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -104,16 +106,17 @@ const CheckoutDrawer = () => {
         items: orderItems,
         subtotal: totalPrice,
         tax: totalTax,
-        discount: totalDiscount,
+        discount: totalDiscount + couponDiscount,
         total: grandTotal,
         table_no: table || '',
-        description: formData.remark || ''
+        description: formData.remark || '',
+        couponCode: couponCode || ''
       };
 
       // Submit order to API
       const response = await saveOrder(orderData, taxes);
 
-      
+
 
       // Show success state
       setIsSubmitted(true);
@@ -128,7 +131,7 @@ const CheckoutDrawer = () => {
       }, 3000);
 
     } catch (error) {
-      
+
       // Handle error (you could show an error message here)
       alert('Failed to place order. Please try again.');
     } finally {
@@ -170,7 +173,7 @@ const CheckoutDrawer = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setIsCheckoutOpen(false)}
+            onClick={() => { setIsCheckoutOpen(false); document.body.style.overflow = 'auto'; }}
             className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
           />
 
@@ -206,188 +209,197 @@ const CheckoutDrawer = () => {
               )}
             </AnimatePresence>
 
-            {/* Header */}
-            <div className="flex items-center gap-4 p-6 border-b border-border">
-              <button
-                onClick={handleBack}
-                className="p-2 rounded-full hover:bg-muted transition-colors text-cream-muted hover:text-cream"
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </button>
-              <h2 className="text-xl font-semibold text-cream">Checkout</h2>
+            {/* Scrollable Container */}
+            <div className="h-full overflow-y-auto flex flex-col">
 
-              <button
-                onClick={() => {setIsCheckoutOpen(false); document.body.style.overflow = 'auto';}}
-                className="p-2 rounded-full hover:bg-muted transition-colors text-cream-muted hover:text-cream ml-auto"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="py-4 px-10 flex gap-3 !text-left text-lg font-medium text-[#B8936E]">
-              Your Table / Room no. is {table}
-            </div>
+              {/* Header */}
+              <div className="flex items-center gap-4 p-6 border-b border-border flex-shrink-0">
+                <button
+                  onClick={handleBack}
+                  className="p-2 rounded-full hover:bg-muted transition-colors text-cream-muted hover:text-cream"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+                <h2 className="text-xl font-semibold text-cream">Checkout</h2>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-6">
-                {/* Restaurant Information */}
-                {restaurantData && (
-                  <div className="bg-[#004240] rounded-xl p-4 border border-border/30 mb-4">
-                    <h3 className="text-sm font-medium text-cream mb-3 flex items-center gap-2">
-                      <Store className="w-4 h-4" />
-                      Restaurant Information
-                    </h3>
-
-
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-start gap-2">
-                        <span className="text-cream-muted">Name:</span>
-                        <span className="text-cream font-medium">{restaurantData.res_name}</span>
-                      </div>
-                      <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 text-cream-muted mt-0.5" />
-                        <span className="text-cream">{restaurantData.address}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <PhoneCall className="w-4 h-4 text-cream-muted" />
-                        <span className="text-cream">{restaurantData.contact_information}</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Order Summary */}
-                <div className="bg-[#004240] rounded-xl p-4 border border-border/30">
-                  <h3 className="text-sm font-medium text-cream mb-3">Order Summary</h3>
-                  <div className="space-y-2">
-                    {items.map(item => (
-                      <div key={item.id} className="flex justify-between text-sm">
-                        <span className="text-cream">
-                          {item.quantity}x {item.name}
-                          {item.selectedVariation && (
-                            <span className="text-accent ml-1">({item.selectedVariation.name})</span>
-                          )}
-                        </span>
-                        <span className="text-cream-muted">₹{(item.price * item.quantity).toFixed(2)}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-border space-y-1">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-cream-muted">Subtotal</span>
-                      <span className="text-cream-muted">₹{totalPrice.toFixed(2)}</span>
-                    </div>
-                    {taxes.map((tax) => {
-                      const taxAmount = (totalPrice * parseFloat(tax.tax)) / 100;
-                      return (
-                        <div key={tax.taxid} className="flex justify-between text-sm">
-                          <span className="text-cream-muted">{tax.taxname}</span>
-                          <span className="text-cream-muted">₹{taxAmount.toFixed(2)}</span>
-                        </div>
-                      );
-                    })}
-                    {/* Only show discount section if there's an actual discount greater than 0 */}
-                    {totalDiscount && totalDiscount > 0 && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-cream-muted">Discount {`(${((totalDiscount / (totalPrice + totalTax)) * 100).toFixed(0)}%)`}</span>
-                        <span className="text-green-500">-₹{totalDiscount.toFixed(2)}</span>
-                      </div>
-                    )}
-                    <div className="flex justify-between font-medium text-cream pt-2 border-t border-border">
-                      <span>Total</span>
-                      <span className="font-semibold text-accent">₹{grandTotal.toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Contact Details */}
-                <div className="space-y-4">
-                  <h3 className="text-sm font-medium text-cream-muted">Contact Details</h3>
-
-                  {/* Name */}
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-muted" />
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Your Name "
-                      
-                      className={`w-full bg-muted/50 border rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all ${errors.name
-                          ? 'border-red-500 focus:border-red-500'
-                          : 'border-border/50 focus:border-accent/50'
-                        }`}
-                    />
-                    {errors.name && (
-                      <p className="mt-1 text-xs text-red-500">{errors.name}</p>
-                    )}
-                  </div>
-
-                  {/* Phone */}
-                  <div className="relative">
-                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-muted" />
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="Phone Number "
-                     
-                      maxLength={15}
-                      className={`w-full bg-muted/50 border rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all ${errors.phone
-                          ? 'border-red-500 focus:border-red-500'
-                          : 'border-border/50 focus:border-accent/50'
-                        }`}
-                    />
-                    {errors.phone && (
-                      <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
-                    )}
-                  </div>
-
-                  {/* Remark */}
-                  <div className="relative">
-                    <MessageSquare className="absolute left-4 top-4 w-5 h-5 text-cream-muted" />
-                    <textarea
-                      name="remark"
-                      value={formData.remark}
-                      onChange={handleChange}
-                      placeholder="Special instructions or remarks"
-                      rows={3}
-                      className="w-full bg-muted/50 border border-border/50 rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all resize-none"
-                    />
-                  </div>
-                </div>
+                <button
+                  onClick={() => { setIsCheckoutOpen(false); document.body.style.overflow = 'auto'; }}
+                  className="p-2 rounded-full hover:bg-muted transition-colors text-cream-muted hover:text-cream ml-auto"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-            </form>
+              <div className="py-4 px-10 flex gap-3 !text-left text-lg font-medium text-[#B8936E] flex-shrink-0">
+                Your Table / Room no. is {table}
+              </div>
 
-            {/* Footer */}
-            <div className="border-t border-border p-6">
-              <motion.button
-                type="submit"
-                onClick={handleSubmit}
-                disabled={!isFormValid || isLoading}
-                whileHover={isFormValid && !isLoading ? { scale: 1.02 } : {}}
-                whileTap={isFormValid && !isLoading ? { scale: 0.98 } : {}}
-                className={`w-full font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition-all ${isFormValid && !isLoading
-                    ? 'bg-accent hover:bg-accent/90 text-accent-foreground'
-                    : 'bg-muted text-cream-muted cursor-not-allowed'
-                  }`}
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Placing Order...
-                  </>
-                ) : (
-                  <>
-                    Place Order - ₹{grandTotal.toFixed(2)}
-                  </>
-                )}
-              </motion.button>
-              <p className="text-xs text-cream-muted text-center mt-3">
-                By placing this order, you agree to our terms and conditions
-              </p>
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="p-6">
+                <div className="space-y-6">
+                  {/* Restaurant Information */}
+                  {restaurantData && (
+                    <div className="bg-[#004240] rounded-xl p-4 border border-border/30 mb-4">
+                      <h3 className="text-sm font-medium text-cream mb-3 flex items-center gap-2">
+                        <Store className="w-4 h-4" />
+                        Restaurant Information
+                      </h3>
+
+
+                      <div className="space-y-2 text-sm">
+                        <div className="flex items-start gap-2">
+                          <span className="text-cream-muted">Name:</span>
+                          <span className="text-cream font-medium">{restaurantData.res_name}</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                          <MapPin className="w-4 h-4 text-cream-muted mt-0.5" />
+                          <span className="text-cream">{restaurantData.address}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <PhoneCall className="w-4 h-4 text-cream-muted" />
+                          <span className="text-cream">{restaurantData.contact_information}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Order Summary */}
+                  <div className="bg-[#004240] rounded-xl p-4 border border-border/30">
+                    <h3 className="text-sm font-medium text-cream mb-3">Order Summary</h3>
+                    <div className="space-y-2">
+                      {items.map(item => (
+                        <div key={item.id} className="flex justify-between text-sm">
+                          <span className="text-cream">
+                            {item.quantity}x {item.name}
+                            {item.selectedVariation && (
+                              <span className="text-accent ml-1">({item.selectedVariation.name})</span>
+                            )}
+                          </span>
+                          <span className="text-cream-muted">₹{(item.price * item.quantity).toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-border space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-cream-muted">Subtotal</span>
+                        <span className="text-cream-muted">₹{totalPrice.toFixed(2)}</span>
+                      </div>
+                      {taxes && taxes.length > 0 && taxes.filter(tax => tax && tax.tax && parseFloat(tax.tax) > 0).length > 0 && taxes.filter(tax => tax && tax.tax && parseFloat(tax.tax) > 0).map((tax) => {
+                        const taxAmount = (totalPrice * parseFloat(tax.tax)) / 100;
+                        return (
+                          <div key={tax.taxid} className="flex justify-between text-sm">
+                            <span className="text-cream-muted">{tax.taxname}</span>
+                            <span className="text-cream-muted">₹{taxAmount.toFixed(2)}</span>
+                          </div>
+                        );
+                      })}
+                      {/* Only show discount section if there's an actual discount greater than 0 */}
+                      {totalDiscount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-cream-muted">Discount {`(${((totalDiscount / (totalPrice + totalTax)) * 100).toFixed(0)}%)`}</span>
+                          <span className="text-green-500">-₹{totalDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {couponDiscount > 0 && (
+                        <div className="flex justify-between text-sm">
+                          <span className="text-cream-muted">Coupon Discount</span>
+                          <span className="text-green-500">-₹{couponDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between font-medium text-cream pt-2 border-t border-border">
+                        <span>Total</span>
+                        <span className="font-semibold text-accent">₹{grandTotal.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Contact Details */}
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-medium text-cream-muted">Contact Details</h3>
+
+                    {/* Name */}
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-muted" />
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Your Name "
+
+                        className={`w-full bg-muted/50 border rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all ${errors.name
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-border/50 focus:border-accent/50'
+                          }`}
+                      />
+                      {errors.name && (
+                        <p className="mt-1 text-xs text-red-500">{errors.name}</p>
+                      )}
+                    </div>
+
+                    {/* Phone */}
+                    <div className="relative">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-cream-muted" />
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="Phone Number "
+
+                        maxLength={15}
+                        className={`w-full bg-muted/50 border rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 transition-all ${errors.phone
+                          ? 'border-red-500 focus:border-red-500'
+                          : 'border-border/50 focus:border-accent/50'
+                          }`}
+                      />
+                      {errors.phone && (
+                        <p className="mt-1 text-xs text-red-500">{errors.phone}</p>
+                      )}
+                    </div>
+
+                    {/* Remark */}
+                    <div className="relative">
+                      <MessageSquare className="absolute left-4 top-4 w-5 h-5 text-cream-muted" />
+                      <textarea
+                        name="remark"
+                        value={formData.remark}
+                        onChange={handleChange}
+                        placeholder="Special instructions or remarks"
+                        rows={3}
+                        className="w-full bg-muted/50 border border-border/50 rounded-xl py-4 pl-12 pr-4 text-cream placeholder:text-cream-muted focus:outline-none focus:ring-2 focus:ring-accent/50 focus:border-accent/50 transition-all resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit Button inside form for proper submit handling, but styled as footer if needed, or just at bottom */}
+                <div className="border-t border-border pt-6 mt-6">
+                  <motion.button
+                    type="submit"
+                    disabled={!isFormValid || isLoading}
+                    whileHover={isFormValid && !isLoading ? { scale: 1.02 } : {}}
+                    whileTap={isFormValid && !isLoading ? { scale: 0.98 } : {}}
+                    className={`w-full font-semibold py-4 rounded-xl flex items-center justify-center gap-2 transition-all ${isFormValid && !isLoading
+                      ? 'bg-accent hover:bg-accent/90 text-accent-foreground'
+                      : 'bg-muted text-cream-muted cursor-not-allowed'
+                      }`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Placing Order...
+                      </>
+                    ) : (
+                      <>
+                        Place Order - ₹{grandTotal.toFixed(2)}
+                      </>
+                    )}
+                  </motion.button>
+                  <p className="text-xs text-cream-muted text-center mt-3">
+                    By placing this order, you agree to our terms and conditions
+                  </p>
+                </div>
+              </form>
             </div>
           </motion.div>
         </>
