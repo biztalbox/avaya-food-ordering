@@ -18,7 +18,8 @@ const CheckoutDrawer = () => {
     totalPriceWithDiscount,
     clearCart,
     couponDiscount,
-    couponCode
+    // couponCode,
+    appliedCoupon
   } = useCart();
 
   const { data: menuData } = useMenuData();
@@ -110,7 +111,8 @@ const CheckoutDrawer = () => {
         total: grandTotal,
         table_no: table || '',
         description: formData.remark || '',
-        couponCode: couponCode || ''
+        couponCode: appliedCoupon?.discountname || '',
+        appliedDiscount: appliedCoupon || undefined
       };
 
       // Submit order to API

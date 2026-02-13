@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CartItem, MenuItem } from '@/types/menu';
+import { CartItem, MenuItem, APIDiscount } from '@/types/menu';
 import { useMenuData } from '@/hooks/useMenuData';
 
 interface CartContextType {
@@ -22,9 +22,10 @@ interface CartContextType {
   setSearchQuery: (query: string) => void;
   filterType: 'all' | 'veg' | 'non-veg';
   setFilterType: (type: 'all' | 'veg' | 'non-veg') => void;
-  couponCode: string;
+  appliedCoupon: APIDiscount | null;
   couponDiscount: number;
-  setCoupon: (code: string, discount: number) => void;
+  applyCoupon: (code: string) => { success: boolean; message: string };
+  removeCoupon: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -35,16 +36,68 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'veg' | 'non-veg'>('all');
-  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<APIDiscount | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
 
-  const setCoupon = useCallback((code: string, discount: number) => {
-    setCouponCode(code);
-    setCouponDiscount(discount);
-  }, []);
   const { data: menuData } = useMenuData();
   const taxes = menuData?.taxes || [];
   const discounts = menuData?.discounts || [];
+
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+
+  const applyCoupon = useCallback((code: string) => {
+    if (!code) {
+      return { success: false, message: 'Please enter a coupon code' };
+    }
+
+    const normalizedCode = code.toLowerCase().trim();
+
+    // Find matching discount in API data
+    const matchedDiscount = discounts.find(d =>
+      d.discountname.toLowerCase() === normalizedCode &&
+      d.active === '1'
+    );
+
+    if (!matchedDiscount) {
+      return { success: false, message: 'Invalid coupon code' };
+    }
+
+    // Check minimum order amount
+    const minAmount = parseFloat(matchedDiscount.discountminamount || '0');
+    if (minAmount > 0 && totalPrice < minAmount) {
+      return { success: false, message: `Minimum order amount of ₹${minAmount} required` };
+    }
+
+    // Calculate discount amount
+    const discountType = parseInt(matchedDiscount.discounttype);
+    const discountValue = parseFloat(matchedDiscount.discount);
+    const maxAmount = parseFloat(matchedDiscount.discountmaxamount || '0');
+
+    let calculatedDiscount = 0;
+
+    if (discountType === 1) { // Percentage
+      calculatedDiscount = (totalPrice * discountValue) / 100;
+    } else if (discountType === 2) { // Fixed
+      calculatedDiscount = discountValue;
+    }
+
+    // Apply maximum limit
+    if (maxAmount > 0 && calculatedDiscount > maxAmount) {
+      calculatedDiscount = maxAmount;
+    }
+
+    setAppliedCoupon(matchedDiscount);
+    setCouponDiscount(calculatedDiscount);
+
+    return { success: true, message: 'Coupon applied successfully' };
+  }, [discounts, totalPrice]);
+
+  const removeCoupon = useCallback(() => {
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
+  }, []);
 
   const addItem = useCallback((item: MenuItem) => {
     setItems(prev => {
@@ -122,8 +175,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     )?.quantity || 0;
   }, [items]);
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+
 
   // Calculate taxes
   const totalTax = taxes.filter(tax => tax && tax.tax && parseFloat(tax.tax) > 0).reduce((sum, tax) => {
@@ -193,9 +246,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setSearchQuery,
       filterType,
       setFilterType,
-      couponCode,
+      appliedCoupon,
       couponDiscount,
-      setCoupon
+      applyCoupon,
+      removeCoupon
     }}>
       {children}
     </CartContext.Provider>

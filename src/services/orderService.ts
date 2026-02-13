@@ -42,6 +42,8 @@ const ORDER_DEFAULTS = {
 };
 
 // Import RestaurantData from useMenuData
+import { APIDiscount } from '@/types/menu';
+
 interface RestaurantData {
   restID: string;
   res_name: string;
@@ -66,6 +68,7 @@ export interface OrderData {
   latitude?: string;
   longitude?: string;
   couponCode?: string;
+  appliedDiscount?: APIDiscount;
 }
 
 // Restaurant interface (keeping for backward compatibility)
@@ -333,6 +336,8 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
     restaurant_liable_amt: '0.00'
   }));
 
+
+
   // Discount details (one entry when discount > 0 or coupon applied)
   let discountDetails: DiscountDetail[] = [];
 
@@ -340,31 +345,27 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
     let discountId = '0';
     let discountType = ORDER_DEFAULTS.discount_type;
     let discountTitle = 'Discount';
+    let discountPrice = orderData.discount.toFixed(2); // Default to total amount if no specific info
 
-    if (orderData.couponCode) {
-      const code = orderData.couponCode.toLowerCase().trim();
-      if (code === 'percentage testing') {
-        discountId = '288566';
-        discountType = '1';
-        discountTitle = 'percentage testing';
-      } else if (code === 'fixed testing') {
-        discountId = '288567';
-        discountType = '2';
-        discountTitle = 'fixed testing';
-      } else if (code === 'bogo testing') {
-        discountId = '28885678';
-        discountType = '3';
-        discountTitle = 'bogo testing';
-      }
+    if (orderData.appliedDiscount) {
+      discountId = orderData.appliedDiscount.discountid;
+      discountType = orderData.appliedDiscount.discounttype;
+      discountTitle = orderData.appliedDiscount.discountname;
+      discountPrice = orderData.appliedDiscount.discount; // The rate (e.g., 10 for 10%) or fixed amount
+    } else if (orderData.couponCode) {
+      // Fallback for codes not in API list but somehow applied (shouldn't happen with new context logic)
+      discountTitle = orderData.couponCode;
     }
 
     discountDetails = [{
       id: discountId,
       title: discountTitle,
       type: discountType,
-      price: orderData.total.toFixed(2)
+      price: discountPrice
     }];
   }
+
+
 
   // Order details (full API shape)
   const orderDetails: OrderDetailsApi = {

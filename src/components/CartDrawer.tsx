@@ -17,9 +17,11 @@ const CartDrawer = () => {
     totalDiscount,
     totalPriceWithDiscount,
     clearCart,
-    couponCode: contextCouponCode,
+    // couponCode: contextCouponCode, // Removed as per interface
     couponDiscount,
-    setCoupon
+    applyCoupon,
+    removeCoupon,
+    appliedCoupon
   } = useCart();
 
   const grandTotal = totalPriceWithDiscount;
@@ -32,7 +34,8 @@ const CartDrawer = () => {
   const PLACEHOLDER_IMAGE = import.meta.env.VITE_BASE_URL + 'placeholder.jpg';
 
   // Local state for input field, sync with context on mount/change
-  const [localCode, setLocalCode] = useState(contextCouponCode);
+  // Local state for input field
+  const [localCode, setLocalCode] = useState(appliedCoupon?.discountname || '');
   const [couponMessage, setCouponMessage] = useState('');
 
   // Sync local code with context if context changes externally (optional but good practice)
@@ -43,37 +46,18 @@ const CartDrawer = () => {
 
   const handleApplyCoupon = () => {
     setCouponMessage('');
-    // Reset context coupon first? Optional.
-    // setCoupon('', 0);
-
-    const code = localCode.toLowerCase().trim();
+    const code = localCode.trim();
 
     if (!code) {
       setCouponMessage('Please enter a coupon code');
       return;
     }
 
-    if (code === 'percentage testing') {
-      // Calculate discount based on CURRENT total (before coupon)
-      // We need the total before coupon to calculate 10%
-      // totalPriceWithTax includes tax but NOT coupon yet (in context it does, so careful)
-      // Actually totalPriceWithTax in context logic: totalPrice + totalTax.
-      // totalPriceWithDiscount in context logic: totalPriceWithTax - finalTotalDiscount - couponDiscount.
-      // So to calculate 10% of "Total Amount", we typically mean totalPriceWithTax - otherDiscounts.
-      // Let's assume on "Total Price" which usually means subtotal+tax-other_discounts.
-      const baseAmount = totalPriceWithTax - totalDiscount;
-      const discount = baseAmount * 0.10;
-      setCoupon(code, discount);
-      setCouponMessage('Coupon applied successfully');
-    } else if (code === 'fixed testing') {
-      setCoupon(code, 100);
-      setCouponMessage('Coupon applied successfully');
-    } else if (code === 'bogo testing') {
-      setCoupon(code, 0);
-      setCouponMessage('Coupon applied successfully');
-    } else {
-      setCouponMessage('Invalid coupon code');
-      setCoupon('', 0);
+    const result = applyCoupon(code);
+    setCouponMessage(result.message);
+
+    if (!result.success) {
+      // clear local code if you want, or keep it for correction
     }
   };
 
@@ -109,7 +93,7 @@ const CartDrawer = () => {
                     <button
                       onClick={() => {
                         clearCart();
-                        setCoupon('', 0);
+                        removeCoupon();
                         setLocalCode('');
                         setCouponMessage('');
                       }}
