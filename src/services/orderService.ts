@@ -8,13 +8,6 @@ const API_CONFIG = {
 };
 
 // Debug: Log environment variables
-console.log('Environment Variables:', {
-  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
-  VITE_MENU_API_URL: import.meta.env.VITE_MENU_API_URL,
-  VITE_ACCESS_TOKEN: import.meta.env.VITE_ACCESS_TOKEN,
-  VITE_APP_KEY: import.meta.env.VITE_APP_KEY,
-  VITE_APP_SECRET: import.meta.env.VITE_APP_SECRET,
-});
 
 // Hardcoded defaults for save_order API (dine-in / table order)
 const ORDER_DEFAULTS = {
@@ -442,7 +435,7 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
 export const saveOrder = async (orderData: OrderData, taxes: any[] = []): Promise<any> => {
   try {
     const transformedData = await transformOrderData(orderData, taxes);
-    console.log('Request Payload:', JSON.stringify(transformedData, null, 2));
+    
 
     const response = await fetch(API_CONFIG.saveOrderEndpoint, {
       method: 'POST',
@@ -452,15 +445,15 @@ export const saveOrder = async (orderData: OrderData, taxes: any[] = []): Promis
       body: JSON.stringify(transformedData)
     });
 
-    console.log('API Response Status:', response.status);
+  
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('API Error Response:', errorText);
+     
       throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
     }
 
     const result = await response.json();
-    console.log('API Success Response:', result);
+   
     return result;
   } catch (error) {
 

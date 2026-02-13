@@ -14,22 +14,21 @@ const Header = () => {
     setTimeout(() => {
       // Try multiple selectors to find menu sections
       let menuSection = document.querySelector('section[id^="category-"]');
-      
+
       // If not found, try other common selectors
       if (!menuSection) {
-        menuSection = document.querySelector('[class*="menu-section"]') || 
-                       document.querySelector('[class*="category"]') ||
-                       document.querySelector('main') ||
-                       document.querySelector('.container');
+        menuSection = document.querySelector('[class*="menu-section"]') ||
+          document.querySelector('[class*="category"]') ||
+          document.querySelector('main') ||
+          document.querySelector('.container');
       }
-      
+
       // As a last resort, scroll to top of page
       if (!menuSection) {
         window.scrollTo({ top: 200, behavior: 'smooth' });
         return;
       }
-      
-      console.log('Found menu section for scroll:', menuSection);
+
       menuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 100);
   };
