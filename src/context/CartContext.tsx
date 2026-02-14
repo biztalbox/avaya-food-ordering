@@ -3,6 +3,7 @@ import { CartItem, MenuItem, APIDiscount } from '@/types/menu';
 import { useMenuData } from '@/hooks/useMenuData';
 
 interface CartContextType {
+  restaurantId: string;
   items: CartItem[];
   addItem: (item: MenuItem) => void;
   removeItem: (itemId: string, variationId?: string) => void;
@@ -30,7 +31,7 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const CartProvider: React.FC<{ children: React.ReactNode; restaurantId: string }> = ({ children, restaurantId }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -39,7 +40,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [appliedCoupon, setAppliedCoupon] = useState<APIDiscount | null>(null);
   const [couponDiscount, setCouponDiscount] = useState(0);
 
-  const { data: menuData } = useMenuData();
+  const { data: menuData } = useMenuData(restaurantId);
   const taxes = menuData?.taxes || [];
   const discounts = menuData?.discounts || [];
 
@@ -123,27 +124,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     // Scroll to menu section after adding item
-    setTimeout(() => {
-      // Try multiple selectors to find menu sections
-      let menuSection = document.querySelector('section[id^="category-"]');
+    // setTimeout(() => {
+    //   // Try multiple selectors to find menu sections
+    //   let menuSection = document.querySelector('section[id^="category-"]');
 
-      // If not found, try other common selectors
-      if (!menuSection) {
-        menuSection = document.querySelector('[class*="menu-section"]') ||
-          document.querySelector('[class*="category"]') ||
-          document.querySelector('main') ||
-          document.querySelector('.container');
-      }
+    //   // If not found, try other common selectors
+    //   if (!menuSection) {
+    //     menuSection = document.querySelector('[class*="menu-section"]') ||
+    //       document.querySelector('[class*="category"]') ||
+    //       document.querySelector('main') ||
+    //       document.querySelector('.container');
+    //   }
 
-      // As a last resort, scroll to top of page
-      if (!menuSection) {
-        window.scrollTo({ top: 200, behavior: 'smooth' });
-        return;
-      }
-
-      console.log('Found menu section:', menuSection);
-      menuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 200);
+    //   // As a last resort, scroll to top of page
+     
+    //   // menuSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // }, 200);
   }, []);
 
   const removeItem = useCallback((itemId: string, variationId?: string) => {
@@ -227,6 +223,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <CartContext.Provider value={{
+      restaurantId,
       items,
       addItem,
       removeItem,
