@@ -129,12 +129,10 @@ const getHeroImage = (categoryName: string, categoryImageUrl: string): string =>
   return getDummyHeroImage(categoryName);
 };
 
-const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: APITax[], discounts: APIDiscount[] }> => {
+const fetchMenuData = async (restaurantId: string): Promise<{ categories: MenuCategory[], taxes: APITax[], discounts: APIDiscount[] }> => {
   const endpoint =
     (import.meta.env.VITE_MENU_API_URL as string | undefined) ??
     'https://avayacafe.com/online-order/api/fetchMenu.php';
-
-  const restaurantId = import.meta.env.VITE_RESTAURANT_ID as string | undefined;
 
   const url = new URL(endpoint, window.location.origin);
   if (restaurantId && restaurantId.trim() !== '') {
@@ -232,10 +230,11 @@ const fetchMenuData = async (): Promise<{ categories: MenuCategory[], taxes: API
   };
 };
 
-export const useMenuData = () => {
+export const useMenuData = (restaurantId: string) => {
   return useQuery({
-    queryKey: ['menuData'],
-    queryFn: fetchMenuData,
+    queryKey: ['menuData', restaurantId],
+    queryFn: () => fetchMenuData(restaurantId),
+    enabled: !!restaurantId?.trim(),
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
     retry: 2,
@@ -255,3 +254,5 @@ export const useRestaurantData = (): RestaurantData | null => {
     return null;
   }
 };
+
+

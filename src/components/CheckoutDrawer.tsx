@@ -7,6 +7,7 @@ import { saveOrder, OrderData, OrderItem } from '@/services/orderService';
 
 const CheckoutDrawer = () => {
   const {
+    restaurantId,
     items,
     isCheckoutOpen,
     setIsCheckoutOpen,
@@ -22,7 +23,7 @@ const CheckoutDrawer = () => {
     appliedCoupon
   } = useCart();
 
-  const { data: menuData } = useMenuData();
+  const { data: menuData } = useMenuData(restaurantId);
   const restaurantData = useRestaurantData();
   const taxes = menuData?.taxes || [];
   const discounts = menuData?.discounts || [];

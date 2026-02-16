@@ -10,9 +10,11 @@ import { CartProvider, useCart } from '@/context/CartContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 
+const RESTAURANT_ID_GP = (import.meta.env.VITE_RESTAURANT_ID_GREEN_PARK as string) || '337973';
+
 const MenuContent = () => {
   const { searchQuery } = useCart();
-  const { data: menuData, isLoading, error } = useMenuData();
+  const { data: menuData, isLoading, error } = useMenuData(RESTAURANT_ID_GP);
   const menuCategories = menuData?.categories;
 
   if (isLoading) {
@@ -94,7 +96,7 @@ const Index = () => {
   }
 
   return (
-    <CartProvider>
+    <CartProvider restaurantId={RESTAURANT_ID_GP}>
       <div className="min-h-screen bg-background overflow-hidden">
         <Header />
         <MenuContent />

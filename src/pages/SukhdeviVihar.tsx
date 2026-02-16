@@ -10,9 +10,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import TableRequired from '@/components/TableRequired';
 
+const RESTAURANT_ID_SV = (import.meta.env.VITE_RESTAURANT_ID_SUKHDEV_VIHAR as string) || '414720';
+
 const SukhdeviViharMenuContent = () => {
   const { searchQuery } = useCart();
-  const { data: menuData, isLoading, error } = useMenuData();
+  const { data: menuData, isLoading, error } = useMenuData(RESTAURANT_ID_SV);
   const menuCategories = menuData?.categories;
   const [tableNumber, setTableNumber] = useState<string | null>(null);
 
@@ -107,7 +109,7 @@ const SukhdeviVihar = () => {
   }
 
   return (
-    <CartProvider>
+    <CartProvider restaurantId={RESTAURANT_ID_SV}>
       <div className="min-h-screen bg-background pt-36 md:pt-20">
         <Header />
         <SukhdeviViharMenuContent />
