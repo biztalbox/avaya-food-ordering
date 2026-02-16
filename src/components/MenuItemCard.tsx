@@ -28,7 +28,7 @@ const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
     <div
       className="relative bg-secondary rounded-xl overflow-hidden shadow-card p-4 ring-1 ring-border/30 h-72 w-64 flex-shrink-0"
     >
-      <div className="flex flex-col items-center gap-3 h-full">
+      <div className="flex flex-col items-start gap-3 h-full">
         {/* Item Image */}
         <div className="w-full h-48 rounded-md bg-muted flex items-center justify-center overflow-hidden">
           {hasImage ? (
@@ -47,19 +47,13 @@ const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
 
         {/* Item Details */}
         <div className="flex flex-col gap-1 w-full">
-          <div className="flex items-center gap-1 justify-center w-full">
-            {/* Veg/Non-Veg Indicator */}
-            <img src={item.isVeg ? veg_img : non_veg_img} alt="Veg/Non-Veg" className={`w-4 h-4`} />
-            <div className="h-12 overflow-hidden w-full">
-              <h4 className="font-medium text-cream text-base text-center leading-tight break-words">
+          <div className="flex items-start gap-2 w-full">
+            <img src={item.isVeg ? veg_img : non_veg_img} alt="Veg/Non-Veg" className="w-4 h-4 mt-1" />
+            <div className="h-12 overflow-hidden flex-1">
+              <h4 className="font-medium text-cream text-base text-left leading-tight break-words">
                 {item.name}
               </h4>
             </div>
-            {/* {item.isVeg !== undefined && (
-              <span className={`flex-shrink-0 ${item.isVeg ? 'text-green-400' : 'text-orange-400'}`}>
-                {item.isVeg ? <Leaf className="w-3.5 h-3.5" /> : <Drumstick className="w-3.5 h-3.5" />}
-              </span>
-            )} */}
           </div>
 
           {/* {item.description && (
