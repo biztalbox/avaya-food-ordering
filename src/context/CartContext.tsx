@@ -219,7 +219,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode; restaurantId: s
 
   const totalPriceWithDiscount = totalPriceWithTax - finalTotalDiscount - couponDiscount;
 
-  const clearCart = useCallback(() => setItems([]), []);
+  const clearCart = useCallback(() => {
+    setItems([]);
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
+  }, []);
 
   return (
     <CartContext.Provider value={{

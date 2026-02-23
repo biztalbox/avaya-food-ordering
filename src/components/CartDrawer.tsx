@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
@@ -38,10 +38,13 @@ const CartDrawer = () => {
   const [localCode, setLocalCode] = useState(appliedCoupon?.discountname || '');
   const [couponMessage, setCouponMessage] = useState('');
 
-  // Sync local code with context if context changes externally (optional but good practice)
-  // useEffect(() => {
-  //   setLocalCode(contextCouponCode);
-  // }, [contextCouponCode]);
+  // Keep the local input in sync with the context applied coupon. When the coupon
+  // is cleared in context (for example after checkout/clearCart), this will
+  // clear the input so it doesn't auto-populate for new orders.
+  useEffect(() => {
+    setLocalCode(appliedCoupon?.discountname || '');
+    if (!appliedCoupon) setCouponMessage('');
+  }, [appliedCoupon]);
 
 
   const handleApplyCoupon = () => {
