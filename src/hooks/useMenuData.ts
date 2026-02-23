@@ -210,7 +210,7 @@ const fetchMenuData = async (restaurantId: string): Promise<{ categories: MenuCa
   // Extract and store restaurant details in localStorage
   const restaurantDetails = apiData.menu?.restaurants?.[0]?.details;
   
-  if (restaurantDetails) {
+  // if (restaurantDetails) {
     const restaurantData: RestaurantData = {
       restID: restaurantDetails.menusharingcode || "N/A",
       res_name: restaurantDetails.restaurantname || 'Unknown Restaurant',
@@ -220,8 +220,7 @@ const fetchMenuData = async (restaurantId: string): Promise<{ categories: MenuCa
     
     // Store restaurant data in localStorage
     localStorage.setItem('restaurantData', JSON.stringify(restaurantData));
-    
-  }
+  // }
   
   return {
     categories: menuCategories,
