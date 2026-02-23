@@ -1,6 +1,9 @@
 // API Configuration
+// Save order: use VITE_SAVE_ORDER_API_URL when set (e.g. your PHP api/save-order.php), else PetPooja directly
 const API_CONFIG = {
-  saveOrderEndpoint: import.meta.env.VITE_API_BASE_URL,
+  saveOrderEndpoint:
+    (import.meta.env.VITE_SAVE_ORDER_API_URL as string | undefined)?.trim() ||
+    import.meta.env.VITE_API_BASE_URL,
   fetchMenuEndpoint: import.meta.env.VITE_MENU_API_URL,
   accessToken: import.meta.env.VITE_ACCESS_TOKEN,
   appKey: import.meta.env.VITE_APP_KEY,
