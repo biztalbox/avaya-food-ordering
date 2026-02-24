@@ -35,13 +35,13 @@ const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
             <img 
               src={item.image} 
               alt={item.name}
-              className="w-full h-full object-contain p-0"
+              className="w-full h-full object-cover p-0"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
               }}
             />
           ) : (
-            <span className="text-5xl">🍽️</span>
+            <img src={PLACEHOLDER_IMAGE} alt="Placeholder" className="w-full h-full object-cover p-0" />
           )}
         </div>
 
