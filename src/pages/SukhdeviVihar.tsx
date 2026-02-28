@@ -85,7 +85,7 @@ const SukhdeviViharMenuContent = () => {
     : menuCategories;
 
   return (
-    <main className="pt-20 min-h-screen">
+    <main className="min-h-screen">
       {sortedCategories.map((category) => (
         <MenuSection key={category.id} category={category} />
       ))}
@@ -110,7 +110,7 @@ const SukhdeviVihar = () => {
 
   return (
     <CartProvider restaurantId={RESTAURANT_ID_SV}>
-      <div className="min-h-screen bg-background pt-36 md:pt-20">
+      <div className="pt-40 md:pt-28 min-h-screen bg-background overflow-hidden">
         <Header />
         <SukhdeviViharMenuContent />
         <Footer />

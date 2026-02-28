@@ -57,28 +57,28 @@ const MenuSection = ({ category }: MenuSectionProps) => {
   const SampleCategoryImage = import.meta.env.VITE_BASE_URL + 'sample_cat.jpeg';
 
   return (
-        <section id={category.id} className={`${getBgClass()}`}>
-      {/* Hero Block - hide when searching */}
+        <section id={category.id} className="bg-primary/30 py-0">
       {!searchQuery && (
-        <div className={`relative min-h-[160px] md:min-h-[200px] flex items-center`}>
-          {/* Background Image */}
-          <div className="absolute inset-0">
+        <>
+         {/* <div className={`relative min-h-[160px] md:min-h-[200px] flex items-center`}> */}
+           {/* Background Image */}
+          {/* <div className="absolute inset-0">
             <img
               src={category.heroImage && category.heroImage.trim() !== '' ? category.heroImage : SampleCategoryImage}
               alt={category.name}
               className="w-full h-full object-cover"
               onError={(e) => { (e.target as HTMLImageElement).src = SampleCategoryImage; }}
-            />
+            /> */}
             {/* Minimal overlay for text readability */}
-            <div className="absolute inset-0 bg-black/60" />
-          </div>
+            {/* <div className="absolute inset-0 bg-black/60" />
+          </div> */}
 
           {/* Text Content */}
           <div className="relative container mx-auto px-6">
             <div
-              className={`max-w-lg ${isLeft ? 'mr-auto' : 'ml-auto text-right'}`}
+              className={`max-w-lg mr-auto text-left`}
             >
-              <h2 className="text-3xl uppercase stroke-2 stroke-white font-normal tracking-wider text-white mb-3 drop-shadow-lg">
+              <h2 className="text-2xl uppercase stroke-2 stroke-white font-normal tracking-wider text-white mb-3 drop-shadow-lg">
                 {category.name}
               </h2>
               {category.tagline ? (
@@ -88,18 +88,19 @@ const MenuSection = ({ category }: MenuSectionProps) => {
               ) : null}
             </div>
           </div>
-        </div>
+        {/* // </div> */}
+        </>
       )}
 
       {/* Search result header */}
       {searchQuery && (
-        <div className="container mx-auto px-6 pt-8">
-          <h3 className="text-xl font-semibold text-light">{category.name}</h3>
+        <div className="container mx-auto px-6">
+          <h3 className="text-2xl uppercase stroke-2 stroke-white font-normal tracking-wider text-white mb-3 drop-shadow-lg">{category.name}</h3>
         </div>
       )}
 
       {/* Items Carousel */}
-      <div className="container mx-auto px-0 pt-8 pb-24">
+      <div className="container mx-auto px-0 pt-2 pb-14">
         <div className="relative group">
           {/* Left Arrow */}
           <button

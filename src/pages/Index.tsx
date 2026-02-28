@@ -72,7 +72,7 @@ const MenuContent = () => {
     : menuCategories;
 
   return (
-    <main className="min-h-screen pt-36 md:pt-20">
+    <main className="min-h-screen">
       {sortedCategories.map((category) => (
         <MenuSection key={category.id} category={category} />
       ))}
@@ -97,7 +97,7 @@ const Index = () => {
 
   return (
     <CartProvider restaurantId={RESTAURANT_ID_GP}>
-      <div className="min-h-screen bg-background overflow-hidden">
+      <div className="pt-40 md:pt-28 min-h-screen bg-background overflow-hidden">
         <Header />
         <MenuContent />
         <Footer />
