@@ -148,19 +148,36 @@ const CartDrawer = () => {
                               <span className="text-accent ml-2">({item.selectedVariation.name})</span>
                             )}
                           </h4>
-                          <p className="text-accent font-semibold mt-1">₹{item.price.toFixed(2)}</p>
+                          {item.selectedAddons && item.selectedAddons.length > 0 && (
+                            <ul className="text-xs text-cream-muted mt-1 space-y-0.5">
+                              {item.selectedAddons.map((a) => (
+                                <li key={a.addonItemId}>
+                                  + {a.addonItemName}
+                                  {a.price > 0 && <span className="text-accent/80"> ₹{a.price.toFixed(2)}</span>}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                          <p className="text-accent font-semibold mt-1">
+                            ₹{item.price.toFixed(2)}
+                            {(item.selectedAddons ?? []).length > 0 && (
+                              <span className="text-cream-muted font-normal text-xs ml-1">
+                                + ₹{(item.selectedAddons!.reduce((s, a) => s + a.price, 0)).toFixed(2)} add-ons
+                              </span>
+                            )}
+                          </p>
 
                           {/* Quantity Controls */}
                           <div className="flex items-center gap-3 mt-2">
                             <button
-                              onClick={() => removeItem(item.id, item.selectedVariation?.id)}
+                              onClick={() => removeItem(item.id, item.selectedVariation?.id, item.selectedAddons)}
                               className="w-7 h-7 rounded-full bg-muted hover:bg-destructive/20 flex items-center justify-center text-cream-muted hover:text-destructive transition-colors"
                             >
                               {item.quantity === 1 ? <Trash2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
                             </button>
                             <span className="text-cream font-medium w-6 text-center">{item.quantity}</span>
                             <button
-                              onClick={() => addItem(item)}
+                              onClick={() => addItem(item, item.selectedAddons)}
                               className="w-7 h-7 rounded-full bg-accent/20 hover:bg-accent/30 flex items-center justify-center text-accent transition-colors"
                             >
                               <Plus className="w-3.5 h-3.5" />
@@ -170,7 +187,9 @@ const CartDrawer = () => {
 
                         {/* Item Total */}
                         <div className="text-right">
-                          <p className="text-cream font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
+                          <p className="text-cream font-semibold">
+                            ₹{((item.price + (item.selectedAddons ?? []).reduce((s, a) => s + a.price, 0)) * item.quantity).toFixed(2)}
+                          </p>
                         </div>
                       </motion.div>
                     ))}

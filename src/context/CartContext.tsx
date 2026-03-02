@@ -1,13 +1,26 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { CartItem, MenuItem, APIDiscount } from '@/types/menu';
+import { CartItem, MenuItem, APIDiscount, SelectedAddon } from '@/types/menu';
 import { useMenuData } from '@/hooks/useMenuData';
+
+function addonKey(addons: SelectedAddon[] | undefined): string {
+  if (!addons || addons.length === 0) return '';
+  return addons
+    .slice()
+    .sort((a, b) => a.addonItemId.localeCompare(b.addonItemId))
+    .map((a) => a.addonItemId)
+    .join(',');
+}
+
+function sameAddons(a: SelectedAddon[] | undefined, b: SelectedAddon[] | undefined): boolean {
+  return addonKey(a) === addonKey(b);
+}
 
 interface CartContextType {
   restaurantId: string;
   items: CartItem[];
-  addItem: (item: MenuItem) => void;
-  removeItem: (itemId: string, variationId?: string) => void;
-  getItemQuantity: (itemId: string, variationId?: string) => number;
+  addItem: (item: MenuItem, selectedAddons?: SelectedAddon[], quantity?: number) => void;
+  removeItem: (itemId: string, variationId?: string, selectedAddons?: SelectedAddon[]) => void;
+  getItemQuantity: (itemId: string, variationId?: string, selectedAddons?: SelectedAddon[]) => number;
   totalItems: number;
   totalPrice: number;
   totalTax: number;
@@ -45,7 +58,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode; restaurantId: s
   const discounts = menuData?.discounts || [];
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => {
+    const addonsTotal = (item.selectedAddons ?? []).reduce((s, a) => s + a.price, 0);
+    return sum + (item.price + addonsTotal) * item.quantity;
+  }, 0);
 
 
   const applyCoupon = useCallback((code: string) => {
@@ -100,27 +116,33 @@ export const CartProvider: React.FC<{ children: React.ReactNode; restaurantId: s
     setCouponDiscount(0);
   }, []);
 
-  const addItem = useCallback((item: MenuItem) => {
+  const addItem = useCallback((item: MenuItem, selectedAddons?: SelectedAddon[], quantity: number = 1) => {
+    const qty = Math.max(1, Math.min(99, quantity));
     setItems(prev => {
-      // Create a unique ID for items with variations
-      const uniqueId = item.selectedVariation
-        ? `${item.id}-${item.selectedVariation.id}`
-        : item.id;
-
-      const existing = prev.find(i =>
-        i.id === item.id &&
-        (!item.selectedVariation || i.selectedVariation?.id === item.selectedVariation.id)
+      const addons = selectedAddons ?? (item as CartItem).selectedAddons;
+      const existing = prev.find(
+        i =>
+          i.id === item.id &&
+          (!item.selectedVariation || i.selectedVariation?.id === item.selectedVariation?.id) &&
+          sameAddons(i.selectedAddons, addons)
       );
 
       if (existing) {
         return prev.map(i =>
-          (i.id === item.id &&
-            (!item.selectedVariation || i.selectedVariation?.id === item.selectedVariation.id))
-            ? { ...i, quantity: i.quantity + 1 }
+          i.id === item.id &&
+          (!item.selectedVariation || i.selectedVariation?.id === item.selectedVariation?.id) &&
+          sameAddons(i.selectedAddons, addons)
+            ? { ...i, quantity: i.quantity + qty }
             : i
         );
       }
-      return [...prev, { ...item, quantity: 1 }];
+      const cartItem: CartItem = {
+        ...item,
+        quantity: qty,
+        selectedVariation: item.selectedVariation,
+        ...(addons && addons.length > 0 && { selectedAddons: addons }),
+      };
+      return [...prev, cartItem];
     });
 
     // Scroll to menu section after adding item
@@ -142,33 +164,43 @@ export const CartProvider: React.FC<{ children: React.ReactNode; restaurantId: s
     // }, 200);
   }, []);
 
-  const removeItem = useCallback((itemId: string, variationId?: string) => {
+  const removeItem = useCallback((itemId: string, variationId?: string, selectedAddons?: SelectedAddon[]) => {
     setItems(prev => {
-      const existing = prev.find(i =>
-        i.id === itemId &&
-        (!variationId || i.selectedVariation?.id === variationId)
+      const existing = prev.find(
+        i =>
+          i.id === itemId &&
+          (!variationId || i.selectedVariation?.id === variationId) &&
+          sameAddons(i.selectedAddons, selectedAddons)
       );
 
       if (existing && existing.quantity > 1) {
         return prev.map(i =>
-          (i.id === itemId &&
-            (!variationId || i.selectedVariation?.id === variationId))
+          i.id === itemId &&
+          (!variationId || i.selectedVariation?.id === variationId) &&
+          sameAddons(i.selectedAddons, selectedAddons)
             ? { ...i, quantity: i.quantity - 1 }
             : i
         );
       }
-      return prev.filter(i =>
-        !(i.id === itemId &&
-          (!variationId || i.selectedVariation?.id === variationId))
+      return prev.filter(
+        i =>
+          !(
+            i.id === itemId &&
+            (!variationId || i.selectedVariation?.id === variationId) &&
+            sameAddons(i.selectedAddons, selectedAddons)
+          )
       );
     });
   }, []);
 
-  const getItemQuantity = useCallback((itemId: string, variationId?: string) => {
-    return items.find(i =>
-      i.id === itemId &&
-      (!variationId || i.selectedVariation?.id === variationId)
-    )?.quantity || 0;
+  const getItemQuantity = useCallback((itemId: string, variationId?: string, selectedAddons?: SelectedAddon[]) => {
+    const found = items.find(
+      i =>
+        i.id === itemId &&
+        (!variationId || i.selectedVariation?.id === variationId) &&
+        sameAddons(i.selectedAddons, selectedAddons)
+    );
+    return found?.quantity ?? 0;
   }, [items]);
 
 

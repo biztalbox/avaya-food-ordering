@@ -181,6 +181,14 @@ export interface SaveOrderRequest {
   device_type: string;
 }
 
+export interface OrderItemAddon {
+  addonItemId: string;
+  addonItemName: string;
+  addonGroupId: string;
+  addonGroupName: string;
+  price: number;
+}
+
 export interface OrderItem {
   item_id: string;
   item_name: string;
@@ -192,6 +200,7 @@ export interface OrderItem {
     name: string;
     price: number;
   };
+  addons?: OrderItemAddon[];
 }
 
 // Order Item Detail for API (with AddonItem)
@@ -292,19 +301,27 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
   const createdOn = `${preorderDate} ${preorderTime}`;  // YYYY-MM-DD HH:mm:ss
   const orderID = generateOrderId();
 
-  // Transform order items (with AddonItem; addons empty for now)
+  // Transform order items (with AddonItem from selected addons)
   const orderItemDetails: OrderItemDetailWithAddon[] = orderData.items.map(item => {
+    const addonsTotal = (item.addons ?? []).reduce((s, a) => s + a.price, 0);
+    const unitPrice = parseFloat(item.price.toString()) + addonsTotal;
     const itemTaxDetails = taxes.map(tax => ({
       id: tax.taxid || tax.id,
       name: tax.taxname || tax.name,
       tax_percentage: (tax.tax || tax.price).toString(),
-      amount: ((parseFloat(item.price.toString()) * item.quantity * parseFloat(tax.tax || '0')) / 100).toFixed(2)
+      amount: ((unitPrice * item.quantity * parseFloat(tax.tax || '0')) / 100).toFixed(2)
     }));
-    const itemPrice = parseFloat(item.price.toString());
     const itemDiscount = orderData.discount > 0 ? (orderData.discount / orderData.items.length).toFixed(2) : '0';
-    const finalPrice = (itemPrice * item.quantity - parseFloat(itemDiscount)).toFixed(2);
-    // tax_inclusive: true when item.ignore_taxes === 0, else false
+    const finalPrice = (unitPrice * item.quantity - parseFloat(itemDiscount)).toFixed(2);
     const taxInclusive = item.ignore_taxes === 0 || item.ignore_taxes === '0';
+    const addonDetails: AddonItemDetail[] = (item.addons ?? []).map((a) => ({
+      id: a.addonItemId,
+      name: a.addonItemName,
+      group_name: a.addonGroupName,
+      price: a.price.toFixed(2),
+      group_id: parseInt(a.addonGroupId, 10) || 0,
+      quantity: item.quantity.toString(),
+    }));
     return {
       id: item.item_id,
       name: item.item_name,
@@ -312,13 +329,13 @@ const transformOrderData = async (orderData: OrderData, taxes: any[] = []): Prom
       gst_liability: 'restaurant',
       item_tax: itemTaxDetails,
       item_discount: itemDiscount,
-      price: itemPrice.toFixed(2),
+      price: unitPrice.toFixed(2),
       final_price: finalPrice,
       quantity: item.quantity.toString(),
       description: '',
       variation_name: item.variation?.name || '',
       variation_id: item.variation?.id || '',
-      AddonItem: { details: [] }
+      AddonItem: { details: addonDetails },
     };
   });
 

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { APIMenuResponse, MenuCategory, MenuItem, APITax, APIDiscount } from '@/types/menu';
+import { APIMenuResponse, MenuCategory, MenuItem, AddonGroup, APITax, APIDiscount } from '@/types/menu';
 import heroCoffee from '@/assets/hero-coffee.jpg';
 const heroBreakfast = 'https://images.unsplash.com/photo-1542276867-c7f5032e1835?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fGJyZWFrZmFzdHxlbnwwfHwwfHx8MA%3D%3D';
 import heroPizza from '@/assets/hero-pizza.jpg';
@@ -162,6 +162,7 @@ const fetchMenuData = async (restaurantId: string): Promise<{ categories: MenuCa
   
   // Map API data to app format
   const allItems = apiData.menu.items ?? [];
+  const addonGroupsMap = new Map((apiData.menu.addongroups ?? []).map((g: { addongroupid: string; addongroup_name: string; addongroup_rank?: string; addongroupitems: { addonitemid: string; addonitem_name: string; addonitem_price: string; addonitem_rank?: string }[] }) => [g.addongroupid, g]));
 
   const menuCategories: MenuCategory[] = categories.map((category, index) => {
     // Get items for this category
@@ -191,6 +192,31 @@ const fetchMenuData = async (restaurantId: string): Promise<{ categories: MenuCa
               name: v.name,
               price: parseFloat(v.price) || 0,
             }));
+        }
+
+        // Add addon groups if item allows addons and has addon refs
+        if (item.itemallowaddon === '1' && item.addon && item.addon.length > 0) {
+          const groups: AddonGroup[] = [];
+          for (const ref of item.addon) {
+            const apiGroup = addonGroupsMap.get(ref.addon_group_id);
+            if (apiGroup && apiGroup.addongroupitems && apiGroup.addongroupitems.length > 0) {
+              groups.push({
+                groupId: apiGroup.addongroupid,
+                groupName: apiGroup.addongroup_name,
+                min: parseInt(ref.addon_item_selection_min || '0'),
+                max: parseInt(ref.addon_item_selection_max || '1'),
+                items: (apiGroup.addongroupitems as { addonitemid: string; addonitem_name: string; addonitem_price: string; addonitem_rank?: string }[])
+                  .sort((a, b) => parseInt(a.addonitem_rank || '0') - parseInt(b.addonitem_rank || '0'))
+                  .map(ai => ({
+                    id: ai.addonitemid,
+                    name: ai.addonitem_name,
+                    price: parseFloat(ai.addonitem_price) || 0,
+                    rank: parseInt(ai.addonitem_rank || '0'),
+                  })),
+              });
+            }
+          }
+          if (groups.length > 0) menuItem.addonGroups = groups;
         }
         
         return menuItem;

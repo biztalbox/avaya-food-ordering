@@ -84,21 +84,28 @@ const CheckoutDrawer = () => {
     setIsLoading(true);
 
     try {
-      // Prepare order items
-      const orderItems: OrderItem[] = items.map(item => ({
-        item_id: item.id,
-        item_name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        ...(item.ignore_taxes !== undefined && { ignore_taxes: item.ignore_taxes }),
-        ...(item.selectedVariation && {
-          variation: {
-            id: item.selectedVariation.id,
-            name: item.selectedVariation.name,
-            price: item.selectedVariation.price,
-          }
-        })
-      }));
+      // Prepare order items (unit price = base + addons for correct totals)
+      const orderItems: OrderItem[] = items.map(item => {
+        const addonsTotal = (item.selectedAddons ?? []).reduce((s, a) => s + a.price, 0);
+        const unitPrice = item.price + addonsTotal;
+        return {
+          item_id: item.id,
+          item_name: item.name,
+          quantity: item.quantity,
+          price: unitPrice,
+          ...(item.ignore_taxes !== undefined && { ignore_taxes: item.ignore_taxes }),
+          ...(item.selectedVariation && {
+            variation: {
+              id: item.selectedVariation.id,
+              name: item.selectedVariation.name,
+              price: item.selectedVariation.price,
+            }
+          }),
+          ...(item.selectedAddons && item.selectedAddons.length > 0 && {
+            addons: item.selectedAddons,
+          }),
+        };
+      });
 
       // Prepare order data
       const orderData: OrderData = {
@@ -268,18 +275,45 @@ const CheckoutDrawer = () => {
                   {/* Order Summary */}
                   <div className="bg-[#004240] rounded-xl p-4 border border-border/30">
                     <h3 className="text-sm font-medium text-cream mb-3">Order Summary</h3>
-                    <div className="space-y-2">
-                      {items.map(item => (
-                        <div key={item.id} className="flex justify-between text-sm">
-                          <span className="text-cream">
-                            {item.quantity}x {item.name}
-                            {item.selectedVariation && (
-                              <span className="text-accent ml-1">({item.selectedVariation.name})</span>
-                            )}
-                          </span>
-                          <span className="text-cream-muted">₹{(item.price * item.quantity).toFixed(2)}</span>
-                        </div>
-                      ))}
+                    <div className="space-y-3">
+                      {items.map((item, idx) => {
+                        const addonsTotal = (item.selectedAddons ?? []).reduce((s, a) => s + a.price, 0);
+                        const unitPrice = item.price + addonsTotal;
+                        const lineTotal = unitPrice * item.quantity;
+                        return (
+                          <div
+                            key={`${item.id}-${item.selectedVariation?.id ?? 'base'}-${(item.selectedAddons ?? []).map(a => a.addonItemId).join(',')}-${idx}`}
+                            className="rounded-lg bg-background/20 border border-border/30 p-3 space-y-2"
+                          >
+                            <div className="flex justify-between items-start gap-2">
+                              <div className="min-w-0">
+                                <p className="text-cream font-medium">
+                                  {item.quantity}× {item.name}
+                                  {item.selectedVariation && (
+                                    <span className="text-accent ml-1">({item.selectedVariation.name})</span>
+                                  )}
+                                </p>
+                                {item.selectedAddons && item.selectedAddons.length > 0 && (
+                                  <ul className="mt-1.5 space-y-0.5 pl-1 border-l-2 border-accent/40 ml-0.5">
+                                    {item.selectedAddons.map((a) => (
+                                      <li key={a.addonItemId} className="text-xs text-cream-muted flex items-center gap-1.5">
+                                        <span className="text-accent/80">+</span>
+                                        <span>{a.addonItemName}</span>
+                                        {a.price > 0 && (
+                                          <span className="text-accent/90">₹{a.price.toFixed(2)}</span>
+                                        )}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                              <span className="font-semibold text-accent flex-shrink-0">
+                                ₹{lineTotal.toFixed(2)}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                     <div className="mt-3 pt-3 border-t border-border space-y-1">
                       <div className="flex justify-between text-sm">

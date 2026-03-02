@@ -8,6 +8,30 @@ export interface APIVariation {
   in_stock?: string;
 }
 
+// API addon types (from fetchMenu response)
+export interface APIAddonGroupRef {
+  addon_group_id: string;
+  addon_item_selection_min: string;
+  addon_item_selection_max: string;
+}
+
+export interface APIAddonItem {
+  addonitemid: string;
+  addonitem_name: string;
+  addonitem_price: string;
+  addonitem_rank?: string;
+  active?: string;
+  attributes?: string;
+}
+
+export interface APIAddonGroup {
+  addongroupid: string;
+  addongroup_name: string;
+  addongroup_rank?: string;
+  active?: string;
+  addongroupitems: APIAddonItem[];
+}
+
 export interface APIItem {
   itemid: string;
   itemname: string;
@@ -17,8 +41,11 @@ export interface APIItem {
   item_image_url: string;
   item_attributeid: string;
   itemallowvariation: string;
+  itemallowaddon?: string;
+  itemaddonbasedon?: string;
   itemrank?: string;
   variation: APIVariation[];
+  addon?: APIAddonGroupRef[];
   active: string;
   in_stock: string;
   ignore_taxes?: string;  // "0" = tax inclusive, else not
@@ -113,6 +140,30 @@ export interface APIMenuResponse {
   };
 }
 
+// App addon types
+export interface AddonItemOption {
+  id: string;
+  name: string;
+  price: number;
+  rank?: number;
+}
+
+export interface AddonGroup {
+  groupId: string;
+  groupName: string;
+  min: number;
+  max: number;
+  items: AddonItemOption[];
+}
+
+export interface SelectedAddon {
+  addonItemId: string;
+  addonItemName: string;
+  addonGroupId: string;
+  addonGroupName: string;
+  price: number;
+}
+
 // App Types
 export interface MenuItem {
   id: string;
@@ -132,6 +183,8 @@ export interface MenuItem {
     name: string;
     price: number;
   };
+  /** Addon groups for this item (min/max selection per group) */
+  addonGroups?: AddonGroup[];
 }
 
 export interface MenuCategory {
@@ -151,4 +204,6 @@ export interface CartItem extends MenuItem {
     name: string;
     price: number;
   };
+  /** Addons chosen for this line (affects price and order payload) */
+  selectedAddons?: SelectedAddon[];
 }

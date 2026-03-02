@@ -1,6 +1,8 @@
-import { Leaf, Drumstick, Plus } from 'lucide-react';
+import { useState } from 'react';
+import { Plus } from 'lucide-react';
 import { MenuItem } from '@/types/menu';
 import { useCart } from '@/context/CartContext';
+import AddonModal from '@/components/AddonModal';
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -13,6 +15,8 @@ const non_veg_img = import.meta.env.VITE_BASE_URL + 'non-veg.png';
 
 const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
   const { addItem, removeItem, getItemQuantity } = useCart();
+  const [addonModalOpen, setAddonModalOpen] = useState(false);
+  const hasAddons = item.addonGroups && item.addonGroups.length > 0;
   
   // Calculate quantities for each variation
   const getVariationQuantity = (variationId: string) => {
@@ -176,16 +180,20 @@ const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
                 </div>
               )}
             </div>
+          ) : hasAddons ? (
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-sm text-accent font-semibold">₹{item.price.toFixed(2)}</span>
+              <button
+                onClick={() => setAddonModalOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-accent/20 text-accent hover:bg-accent/30 font-medium text-sm transition-colors"
+              >
+                <Plus className="w-4 h-4" />
+                Customize & add
+              </button>
+            </div>
           ) : (
             <div className="flex items-center justify-between gap-2">
-              {/* <button
-                onClick={() => addItem(item)}
-                className="flex items-center gap-1 bg-[#004240] hover:bg-[#004240] text-[#B8936E] px-2 py-1 rounded transition-colors"
-              >
-                <Plus className="w-3 h-3" />
-              </button> */}
                 <span className="text-sm text-accent font-semibold">₹{item.price.toFixed(2)}</span>
-              {/* {normalItemQuantity > 0 && ( */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => removeItem(item.id)}
@@ -203,12 +211,22 @@ const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
                     <span className="text-base leading-none">+</span>
                   </button>
                 </div>
-              {/* )} */}
             </div>
           )}
           </div>
         </div>
       </div>
+
+      {addonModalOpen && (
+        <AddonModal
+          item={item}
+          onConfirm={(selectedAddons, quantity) => {
+            addItem(item, selectedAddons, quantity);
+            setAddonModalOpen(false);
+          }}
+          onClose={() => setAddonModalOpen(false)}
+        />
+      )}
     </div>
   );
 };
