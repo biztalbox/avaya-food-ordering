@@ -53,7 +53,7 @@ const MenuItemCard = ({ item, index }: MenuItemCardProps) => {
         <div className="flex flex-col gap-1 w-full">
           <div className="flex items-start gap-2 w-full">
             <img src={item.isVeg ? veg_img : non_veg_img} alt="Veg/Non-Veg" className="w-4 h-4 mt-1" />
-            <div className="h-12 overflow-hidden flex-1">
+            <div className="flex-1">
               <h4 className="font-medium text-cream text-base text-left leading-tight break-words">
                 {item.name}
               </h4>
